@@ -1,0 +1,156 @@
+﻿<!DOCTYPE html>
+
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - FuelPredictor</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" asp-append-version="true" />
+    <link rel="stylesheet" href="~/WebApplication1.styles.css" asp-append-version="true" />
+</head>
+<body>
+    <header class="container-fluid">
+
+
+        <nav class="navbar navbar-expand-lg navbar-dark " style="background-color: green; margin-bottom: 10px">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="#">
+
+                    <img src="@Url.Content("~/images/fuel.jpg")" style=" height:40px;width:70px" alt="Image 1" />
+                </a>
+
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#main_nav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="main_nav">
+
+                    <ul class="navbar-nav me-auto">
+
+                        <li class="nav-item active">
+                            <a class="nav-link text-white" asp-area="Customer" asp-controller="Home" asp-action="Index">Home</a>
+                        </li>
+                        @if (User.IsInRole("SuperAdmin"))
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">  Admin Page </a>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <a class="dropdown-item" href="#"> Gestion des roles </a>
+                                        <ul class="submenu dropdown-menu">
+                                            <li><a class="dropdown-item" asp-area="" asp-controller="RoleManager"> Roles </a></li>
+                                            <li><a class="dropdown-item" asp-area="" asp-controller="UserRoles">Utilisateurs</a></li>
+
+                                        </ul>
+
+
+
+
+                                </ul>
+                            </li>
+                        }
+
+
+
+                        @if (User.IsInRole("Gerant"))
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">  Gerant Page </a>
+                                <ul class="dropdown-menu">
+
+                                    <li><a class="dropdown-item" asp-area="" asp-controller="Stations" asp-action="Index"> Stations </a></li>
+                                </ul>
+
+                            </li>
+                        }
+
+
+                    </ul>
+
+                    <ul class="navbar-nav">
+                        <partial name="_LoginPartial" />
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+
+
+    
+
+        <h1 class="header-title">Station Dashboard</h1>
+     
+        <div class=" station-info">
+            <p>Casablanca Station, Morocco</p>
+            <i class="fas fa-gas-pump"></i>
+        </div>
+    </header>
+    <div class="container">
+        @RenderBody()
+    </div>
+</body>
+</html>
+
+
+<style>
+    header {
+        background-color: #4CAF50;
+        color: white;
+        padding: 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .header-title {
+        font-size: 1.5rem;
+    }
+
+    .station-info {
+        display: flex;
+        align-items: center;
+    }
+</style>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        // make it as accordion for smaller screens
+        if (window.innerWidth < 992) {
+
+            // close all inner dropdowns when parent is closed
+            document.querySelectorAll('.navbar .dropdown').forEach(function (everydropdown) {
+                everydropdown.addEventListener('hidden.bs.dropdown', function () {
+                    // after dropdown is hidden, then find all submenus
+                    this.querySelectorAll('.submenu').forEach(function (everysubmenu) {
+                        // hide every submenu as well
+                        everysubmenu.style.display = 'none';
+                    });
+                })
+            });
+
+            document.querySelectorAll('.dropdown-menu a').forEach(function (element) {
+                element.addEventListener('click', function (e) {
+                    let nextEl = this.nextElementSibling;
+                    if (nextEl && nextEl.classList.contains('submenu')) {
+                        // prevent opening link if link needs to open dropdown
+                        e.preventDefault();
+                        if (nextEl.style.display == 'block') {
+                            nextEl.style.display = 'none';
+                        } else {
+                            nextEl.style.display = 'block';
+                        }
+
+                    }
+                });
+            })
+        }
+        // end if innerWidth
+    });
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/solid.min.js" integrity="sha512-apZ8JDL5kA1iqvafDdTymV4FWUlJd8022mh46oEMMd/LokNx9uVAzhHk5gRll+JBE6h0alB2Upd3m+ZDAofbaQ==" crossorigin="anonymous" referrerpolicy="no-referrer" asp-append-version="true"></script>
+<script src="~/lib/jquery/dist/jquery.min.js" asp-append-version="true"></script>
+<script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js" asp-append-version="true"></script>
+<script src="~/js/site.js" asp-append-version="true"></script>
+
+@await RenderSectionAsync("Scripts", required: false)

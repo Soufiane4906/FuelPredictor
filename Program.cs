@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using FuelPredictor.Data;
 using FuelPredictor.Models;
 using System.Configuration;
+using FuelPredictor.Models.Users;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("FuelPredictorContextConnection") ?? throw new InvalidOperationException("Connection string 'FuelPredictorContextConnection' not found.");
@@ -13,7 +14,7 @@ var connectionString = builder.Configuration.GetConnectionString("FuelPredictorC
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<FuelPredictorContext>();*/
 
-builder.Services.AddDbContext<FuelPredictorContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("FuelPredictorContextConnection")));
+builder.Services.AddDbContext<FuelPredictorContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("FuelPredictorContextConnection") ));
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
         .AddEntityFrameworkStores<FuelPredictorContext>()
         .AddDefaultUI()
@@ -42,9 +43,19 @@ app.UseRouting();
 app.UseAuthentication();;
 
 app.UseAuthorization();
+app.MapRazorPages();
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
+    var roleManager = services.GetRequiredService<RoleManager<IdentityRole>>();
+    await ContextSeed.SeedRolesAsync(userManager, roleManager);
+    await ContextSeed.SeedSuperAdminAsync(userManager, roleManager);
+}
+
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}");
+    pattern: "{controller=Stations}/{action=Index}/{id?}");
 
 app.Run();

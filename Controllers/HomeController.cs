@@ -1,5 +1,7 @@
-﻿using FuelPredictor.Models;
+﻿using FuelPredictor.Data;
+using FuelPredictor.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 
 namespace FuelPredictor.Controllers
@@ -8,16 +10,37 @@ namespace FuelPredictor.Controllers
     {
         private readonly ILogger<HomeController> _logger;
 
-        public HomeController(ILogger<HomeController> logger)
+        private readonly FuelPredictorContext _context;
+
+        public HomeController(ILogger<HomeController> logger, FuelPredictorContext context)
         {
             _logger = logger;
+            _context = context;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
+            // Fetch all stations from the database
+            // Inside your method
+            var stations = await _context.Station.ToListAsync();
+
+            // Create a list to store marker coordinates
+            var markers = new List<Tuple<string, string>>();
+
+            // Iterate through each station to extract coordinates
+            foreach (var station in stations)
+            {
+                markers.Add(new Tuple<string, string>(station.Latitude, station.Longitude));
+                string latitude, longitude;
+
+                // Convert Latitude and Longitude strings to doubles
+           
+            }
+            // Pass the markers to the view
+            ViewBag.Markers = markers;
+
             return View();
         }
-
         public IActionResult Privacy()
         {
             return View();

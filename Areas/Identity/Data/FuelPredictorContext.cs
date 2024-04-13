@@ -1,48 +1,66 @@
-﻿using FuelPredictor.Models;
+﻿using FuelPredictor.Models.Users;
+using FuelPredictor.Models.V2;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection.Emit;
 
 namespace FuelPredictor.Data;
 
-public class FuelPredictorContext : IdentityDbContext<ApplicationUser>
+public class FuelPredictorContext : IdentityDbContext<IdentityUser>
 {
     public FuelPredictorContext(DbContextOptions<FuelPredictorContext> options)
         : base(options)
     {
     }
+    public DbSet<ApplicationUser> ApplicationUser { get; set; }
+    public DbSet<Station> Station { get; set; }
+    public DbSet<PrixJournalier> PrixJournalier { get; set; }
+    public DbSet<Carburant> Carburant { get; set; }
 
-    protected override void OnModelCreating(ModelBuilder builder)
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        base.OnModelCreating(builder);
-        builder.HasDefaultSchema("Identity");
-        builder.Entity<IdentityUser>(entity =>
+
+
+
+        base.OnModelCreating(modelBuilder);
+        modelBuilder.HasDefaultSchema("Identity");
+        modelBuilder.Entity<IdentityUser>(entity =>
         {
             entity.ToTable(name: "User");
         });
-        builder.Entity<IdentityRole>(entity =>
+        modelBuilder.Entity<IdentityRole>(entity =>
         {
             entity.ToTable(name: "Role");
         });
-        builder.Entity<IdentityUserRole<string>>(entity =>
+        modelBuilder.Entity<IdentityUserRole<string>>(entity =>
         {
             entity.ToTable("UserRoles");
         });
-        builder.Entity<IdentityUserClaim<string>>(entity =>
+        modelBuilder.Entity<IdentityUserClaim<string>>(entity =>
         {
             entity.ToTable("UserClaims");
         });
-        builder.Entity<IdentityUserLogin<string>>(entity =>
+        modelBuilder.Entity<IdentityUserLogin<string>>(entity =>
         {
             entity.ToTable("UserLogins");
         });
-        builder.Entity<IdentityRoleClaim<string>>(entity =>
+        modelBuilder.Entity<IdentityRoleClaim<string>>(entity =>
         {
             entity.ToTable("RoleClaims");
         });
-        builder.Entity<IdentityUserToken<string>>(entity =>
+        modelBuilder.Entity<IdentityUserToken<string>>(entity =>
         {
             entity.ToTable("UserTokens");
         });
+
+
+
+
     }
-}
+
+
+
+    }
+
