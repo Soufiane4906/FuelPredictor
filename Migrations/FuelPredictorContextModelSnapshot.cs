@@ -93,13 +93,11 @@ namespace FuelPredictor.Migrations
                     b.Property<string>("IDGerant")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("Latitude")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<double>("Latitude")
+                        .HasColumnType("float");
 
-                    b.Property<string>("Longitude")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<double>("Longitude")
+                        .HasColumnType("float");
 
                     b.Property<string>("Nom")
                         .IsRequired()

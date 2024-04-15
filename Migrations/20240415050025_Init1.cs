@@ -5,12 +5,28 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace FuelPredictor.Migrations
 {
-    public partial class first : Migration
+    public partial class Init1 : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.EnsureSchema(
                 name: "Identity");
+
+            migrationBuilder.CreateTable(
+                name: "Carburant",
+                schema: "Identity",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DeletedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Carburant", x => x.Id);
+                });
 
             migrationBuilder.CreateTable(
                 name: "Role",
@@ -33,6 +49,11 @@ namespace FuelPredictor.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Discriminator = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    FirstName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    LastName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    UsernameChangeLimit = table.Column<int>(type: "int", nullable: true),
+                    ProfilePicture = table.Column<byte[]>(type: "varbinary(max)", nullable: true),
                     UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
                     Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
@@ -77,6 +98,33 @@ namespace FuelPredictor.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Station",
+                schema: "Identity",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Nom = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Adresse = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Latitude = table.Column<double>(type: "float", nullable: false),
+                    Longitude = table.Column<double>(type: "float", nullable: false),
+                    IDGerant = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DeletedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Station", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Station_User_IDGerant",
+                        column: x => x.IDGerant,
+                        principalSchema: "Identity",
+                        principalTable: "User",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
                 name: "UserClaims",
                 schema: "Identity",
                 columns: table => new
@@ -104,8 +152,8 @@ namespace FuelPredictor.Migrations
                 schema: "Identity",
                 columns: table => new
                 {
-                    LoginProvider = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
-                    ProviderKey = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
+                    LoginProvider = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ProviderKey = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     ProviderDisplayName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
@@ -154,8 +202,8 @@ namespace FuelPredictor.Migrations
                 columns: table => new
                 {
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    LoginProvider = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
+                    LoginProvider = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Value = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
@@ -170,6 +218,35 @@ namespace FuelPredictor.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "PrixJournalier",
+                schema: "Identity",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    StationId = table.Column<int>(type: "int", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    DeletedAt = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PrixJournalier", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_PrixJournalier_Station_StationId",
+                        column: x => x.StationId,
+                        principalSchema: "Identity",
+                        principalTable: "Station",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PrixJournalier_StationId",
+                schema: "Identity",
+                table: "PrixJournalier",
+                column: "StationId");
+
             migrationBuilder.CreateIndex(
                 name: "RoleNameIndex",
                 schema: "Identity",
@@ -183,6 +260,12 @@ namespace FuelPredictor.Migrations
                 schema: "Identity",
                 table: "RoleClaims",
                 column: "RoleId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Station_IDGerant",
+                schema: "Identity",
+                table: "Station",
+                column: "IDGerant");
 
             migrationBuilder.CreateIndex(
                 name: "EmailIndex",
@@ -220,6 +303,14 @@ namespace FuelPredictor.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "Carburant",
+                schema: "Identity");
+
+            migrationBuilder.DropTable(
+                name: "PrixJournalier",
+                schema: "Identity");
+
+            migrationBuilder.DropTable(
                 name: "RoleClaims",
                 schema: "Identity");
 
@@ -237,6 +328,10 @@ namespace FuelPredictor.Migrations
 
             migrationBuilder.DropTable(
                 name: "UserTokens",
+                schema: "Identity");
+
+            migrationBuilder.DropTable(
+                name: "Station",
                 schema: "Identity");
 
             migrationBuilder.DropTable(

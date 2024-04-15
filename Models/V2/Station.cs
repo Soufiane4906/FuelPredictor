@@ -11,8 +11,8 @@ namespace FuelPredictor.Models.V2
 
         public string Nom { get; set; }
         public string Adresse { get; set; }
-        public string Latitude { get; set; }
-        public string Longitude { get; set; }
+        public double Latitude { get; set; }
+        public double Longitude { get; set; }
 /*        public Point Location { get; set; }
 */
         // Propriété de navigation vers l'utilisateur (gerant)

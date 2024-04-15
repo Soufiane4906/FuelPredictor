@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FuelPredictor.Migrations
 {
     [DbContext(typeof(FuelPredictorContext))]
-    [Migration("20240412235717_switch to double")]
-    partial class switchtodouble
+    [Migration("20240415050025_Init1")]
+    partial class Init1
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

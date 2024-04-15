@@ -7,8 +7,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using FuelPredictor.Data;
 using FuelPredictor.Models.V2;
-using Microsoft.AspNetCore.Identity;
 using FuelPredictor.Models.Users;
+using Microsoft.AspNetCore.Identity;
 
 namespace FuelPredictor.Controllers
 {
@@ -17,17 +17,18 @@ namespace FuelPredictor.Controllers
         private readonly FuelPredictorContext _context;
         private readonly UserManager<ApplicationUser> _userManager;
 
-
-        public StationsController(FuelPredictorContext context ,  UserManager<ApplicationUser> userManager)
-        {        _userManager = userManager;
-
+        public StationsController(FuelPredictorContext context , UserManager<ApplicationUser> userManager)
+        {
             _context = context;
+            _userManager = userManager;
+
         }
 
         // GET: Stations
         public async Task<IActionResult> Index()
         {
-            var fuelPredictorContext = _context.Station.Include(s => s.Gerant);
+            var currentUser = await _userManager.GetUserAsync(User);
+            var fuelPredictorContext = _context.Station.Include(s => s.Gerant).Where(g=>g.IDGerant==currentUser.Id);
             return View(await fuelPredictorContext.ToListAsync());
         }
 
@@ -62,11 +63,10 @@ namespace FuelPredictor.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Nom,Adresse,Latitude,Longitude")] Station station)
+        public async Task<IActionResult> Create([Bind("Nom,Adresse,Latitude,Longitude,Id")] Station station)
         {
             if (ModelState.IsValid)
             {
-                // Récupérer l'utilisateur courant
                 var currentUser = await _userManager.GetUserAsync(User);
 
                 if (currentUser == null)
@@ -79,12 +79,13 @@ namespace FuelPredictor.Controllers
                 // Assigner l'ID de l'utilisateur courant à la station
                 station.IDGerant = currentUser.Id;
 
-                // Ajouter la station à la base de données
+                // Set the Gerant navigation property of the station
+                station.Gerant = currentUser;
                 _context.Add(station);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            // Si le modèle n'est pas valide, retourner à la vue avec les données de la station
+           // ViewData["IDGerant"] = new SelectList(_context.ApplicationUser, "Id", "Id", station.IDGerant);
             return View(station);
         }
 
@@ -101,7 +102,7 @@ namespace FuelPredictor.Controllers
             {
                 return NotFound();
             }
-            ViewData["IDGerant"] = new SelectList(_context.ApplicationUser, "Id", "Id", station.IDGerant);
+            //ViewData["IDGerant"] = new SelectList(_context.ApplicationUser, "Id", "Id", station.IDGerant);
             return View(station);
         }
 
@@ -110,7 +111,7 @@ namespace FuelPredictor.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Nom,Adresse,Latitude,Longitude,IDGerant,Id,CreatedAt,UpdatedAt,DeletedAt")] Station station)
+        public async Task<IActionResult> Edit(int id, [Bind("Nom,Adresse,Latitude,Longitude,Id")] Station station)
         {
             if (id != station.Id)
             {
@@ -121,6 +122,13 @@ namespace FuelPredictor.Controllers
             {
                 try
                 {
+                    ApplicationUser currentUser = await _userManager.GetUserAsync(User);
+
+                    // Set the IDGerant property of the station
+                    station.IDGerant = currentUser.Id;
+
+                    // Set the Gerant navigation property of the station
+                    station.Gerant = currentUser;
                     _context.Update(station);
                     await _context.SaveChangesAsync();
                 }
@@ -137,7 +145,7 @@ namespace FuelPredictor.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["IDGerant"] = new SelectList(_context.ApplicationUser, "Id", "Id", station.IDGerant);
+          //  ViewData["IDGerant"] = new SelectList(_context.ApplicationUser, "Id", "Id", station.IDGerant);
             return View(station);
         }
 

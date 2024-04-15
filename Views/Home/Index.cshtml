@@ -1,4 +1,26 @@
-﻿@{
+﻿@model IEnumerable<FuelPredictor.Models.V2.Station>
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+
+
+
+
+
+
+
+
+
+
+@{
     ViewData["Title"] = "Home Page";
 }
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
@@ -11,15 +33,58 @@
         <div class="col-6">
             <div id="map" style="height: 400px;"></div>
         </div>
-        <div class="col-6"></div>
-    </div>
-    <div class="left">
+        <div class="col-6">
+            <div class="right">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>
+                                @Html.DisplayNameFor(model => model.Nom)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.Adresse)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.Latitude)
+                            </th>
+                            <th>
+                                @Html.DisplayNameFor(model => model.Longitude)
+                            </th>
+
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Nom)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Adresse)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Latitude)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.Longitude)
+                                </td>
+
+                                <td>
+                                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+
+            </div>
+        </div>
     </div>
 
-    <!-- Right column for the empty space -->
-    <div class="right">
-        <!-- This space is empty -->
-    </div>
+   
 </div>
 
 
@@ -34,15 +99,42 @@
     }).addTo(map);
 
     // Extract markers from ViewBag
-    var markers = @Html.Raw(Json.Serialize(ViewBag.Markers));
+    var jsModel = @Html.Raw(Json.Serialize(Model));
+    console.log(jsModel)
 
     // Add markers for each station
-    markers.forEach(marker => {
-        L.marker([marker[0], marker[1]]).addTo(map);
-    });
+
+    for(i in jsModel){
+
+        item=jsModel[i]
+        L.marker([item.latitude , item.longitude]).addTo(map)
+        .bindPopup(item.nom+'<br>' +item.adresse)
+        .openPopup;
+        
+    };
+
 </script>
 <style>
     /* Define a layout with two columns */
- 
-  
+
+
 </style>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

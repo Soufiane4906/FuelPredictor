@@ -25,21 +25,21 @@ namespace FuelPredictor.Controllers
             var stations = await _context.Station.ToListAsync();
 
             // Create a list to store marker coordinates
-            var markers = new List<Tuple<string, string>>();
+/*            var markers = new List<Tuple<double, double>>();
 
             // Iterate through each station to extract coordinates
             foreach (var station in stations)
             {
-                markers.Add(new Tuple<string, string>(station.Latitude, station.Longitude));
+                markers.Add(new Tuple<double, double>(station.Latitude, station.Longitude));
                 string latitude, longitude;
 
                 // Convert Latitude and Longitude strings to doubles
            
             }
             // Pass the markers to the view
-            ViewBag.Markers = markers;
+            ViewBag.Markers = markers;*/
 
-            return View();
+            return View(await _context.Station.ToListAsync());
         }
         public IActionResult Privacy()
         {
