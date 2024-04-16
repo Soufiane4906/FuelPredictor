@@ -1,15 +1,15 @@
 ﻿@model IEnumerable<FuelPredictor.Models.V2.Station>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Home Page";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Index</h1>
+<h4>Liste des prix des stations au @DateTime.Now.Date</h4>
 
-<p>
+@*<p>
     <a asp-action="Create">Create New</a>
-</p>
+</p>*@
 
 
 
@@ -29,6 +29,7 @@
 
 <div class="container">
     <!-- Left column for the map -->
+
     <div class="row">
         <div class="col-6">
             <div id="map" style="height: 400px;"></div>
@@ -72,7 +73,7 @@
                                 </td>
 
                                 <td>
-                                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                                    <a asp-controller="Stations" class="btn btn-outline-secondary" asp-action="Details" asp-route-id="@item.Id">Details</a> |
 
                                 </td>
                             </tr>
@@ -109,7 +110,7 @@
         item=jsModel[i]
         L.marker([item.latitude , item.longitude]).addTo(map)
         .bindPopup(item.nom+'<br>' +item.adresse)
-        .openPopup;
+        .openPopup();
         
     };
 
