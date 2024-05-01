@@ -2,14 +2,9 @@
 {
     public class Carburant : ModelBase
     {
-        public TypeCarburant TypeCarburant;
+        public string TypeCarburant { get; set; }
     }
 
-    public enum TypeCarburant
-    {
-        Essence,
-        Diesel
-        
-    }
+
 }
 

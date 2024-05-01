@@ -18,6 +18,7 @@ public class FuelPredictorContext : IdentityDbContext<IdentityUser>
     public DbSet<Station> Station { get; set; }
     public DbSet<PrixJournalier> PrixJournalier { get; set; }
     public DbSet<Carburant> Carburant { get; set; }
+    public DbSet<Company> Companies { get; set; }
 
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

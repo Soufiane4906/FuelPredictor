@@ -4,6 +4,7 @@ using FuelPredictor.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,14 +12,15 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FuelPredictor.Migrations
 {
     [DbContext(typeof(FuelPredictorContext))]
-    partial class FuelPredictorContextModelSnapshot : ModelSnapshot
+    [Migration("20240430130019_Test")]
+    partial class Test
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasDefaultSchema("Identity")
-                .HasAnnotation("ProductVersion", "6.0.29")
+                .HasAnnotation("ProductVersion", "6.0.28")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
@@ -37,52 +39,12 @@ namespace FuelPredictor.Migrations
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("TypeCarburant")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
                     b.ToTable("Carburant", "Identity");
-                });
-
-            modelBuilder.Entity("FuelPredictor.Models.V2.Company", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<string>("Adresse")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<byte[]>("Image")
-                        .HasColumnType("varbinary(max)");
-
-                    b.Property<string>("Nom")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Pays")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("Telephone")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Companies", "Identity");
                 });
 
             modelBuilder.Entity("FuelPredictor.Models.V2.PrixJournalier", b =>
@@ -107,12 +69,6 @@ namespace FuelPredictor.Migrations
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("date")
-                        .HasColumnType("datetime2");
-
-                    b.Property<float>("prix")
-                        .HasColumnType("real");
 
                     b.HasKey("Id");
 
@@ -141,9 +97,6 @@ namespace FuelPredictor.Migrations
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int?>("IDCompany")
-                        .HasColumnType("int");
-
                     b.Property<string>("IDGerant")
                         .HasColumnType("nvarchar(450)");
 
@@ -161,8 +114,6 @@ namespace FuelPredictor.Migrations
                         .HasColumnType("datetime2");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("IDCompany");
 
                     b.HasIndex("IDGerant");
 
@@ -397,7 +348,7 @@ namespace FuelPredictor.Migrations
 
             modelBuilder.Entity("FuelPredictor.Models.V2.PrixJournalier", b =>
                 {
-                    b.HasOne("FuelPredictor.Models.V2.Carburant", "Carburant")
+                    b.HasOne("FuelPredictor.Models.V2.Carburant", "GeCarburantrant")
                         .WithMany()
                         .HasForeignKey("IDCarburant");
 
@@ -407,22 +358,16 @@ namespace FuelPredictor.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Carburant");
+                    b.Navigation("GeCarburantrant");
 
                     b.Navigation("Station");
                 });
 
             modelBuilder.Entity("FuelPredictor.Models.V2.Station", b =>
                 {
-                    b.HasOne("FuelPredictor.Models.V2.Company", "Company")
-                        .WithMany("Stations")
-                        .HasForeignKey("IDCompany");
-
                     b.HasOne("FuelPredictor.Models.Users.ApplicationUser", "Gerant")
                         .WithMany("Stations")
                         .HasForeignKey("IDGerant");
-
-                    b.Navigation("Company");
 
                     b.Navigation("Gerant");
                 });
@@ -476,11 +421,6 @@ namespace FuelPredictor.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("FuelPredictor.Models.V2.Company", b =>
-                {
-                    b.Navigation("Stations");
                 });
 
             modelBuilder.Entity("FuelPredictor.Models.V2.Station", b =>

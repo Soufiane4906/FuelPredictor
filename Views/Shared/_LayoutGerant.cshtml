@@ -41,6 +41,7 @@
                                         <ul class="submenu dropdown-menu">
                                             <li><a class="dropdown-item" asp-area="" asp-controller="RoleManager"> Roles </a></li>
                                             <li><a class="dropdown-item" asp-area="" asp-controller="UserRoles">Utilisateurs</a></li>
+                                            <li><a class="dropdown-item" asp-area="" asp-controller="Companies" asp-action="Index"> Sociétés </a></li>
 
                                         </ul>
 
@@ -53,13 +54,17 @@
 
 
 
+
                         @if (User.IsInRole("Gerant"))
                         {
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">  Gerant Page </a>
                                 <ul class="dropdown-menu">
 
+                                    <li><a class="dropdown-item" asp-area="" asp-controller="Companies" asp-action="Index"> Sociétés </a></li>
                                     <li><a class="dropdown-item" asp-area="" asp-controller="Stations" asp-action="Index"> Stations </a></li>
+                                    <li><a class="dropdown-item" asp-area="" asp-controller="Carburants" asp-action="Index"> Carburants </a></li>
+                                    <li><a class="dropdown-item" asp-area="" asp-controller="PrixJournaliers" asp-action="Index"> PrixJournaliers </a></li>
                                 </ul>
 
                             </li>

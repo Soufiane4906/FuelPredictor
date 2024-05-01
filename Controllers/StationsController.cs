@@ -55,6 +55,7 @@ namespace FuelPredictor.Controllers
         public IActionResult Create()
         {
             ViewData["IDGerant"] = new SelectList(_context.ApplicationUser, "Id", "Id");
+            ViewData["IDCompany"] = new SelectList(_context.Companies, "Id", "Name");
             return View();
         }
 

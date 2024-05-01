@@ -21,6 +21,10 @@ namespace FuelPredictor.Models.V2
         public string? IDGerant { get; set; }
         [ForeignKey("IDGerant")]
         public ApplicationUser? Gerant { get; set; }
+
+        public int? IDCompany { get; set; }
+        [ForeignKey("IDCompany")]
+        public Company Company { get; set; }
         public virtual ICollection<PrixJournalier>? PrixJournaliers { get; set; }
 
 
