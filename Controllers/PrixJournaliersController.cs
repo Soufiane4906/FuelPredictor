@@ -26,6 +26,16 @@ namespace FuelPredictor.Controllers
             return View(await fuelPredictorContext.ToListAsync());
         }
 
+        public async Task<IActionResult> IndexStation(int? id)
+        {
+            if (id == null || _context.PrixJournalier == null)
+            {
+                return NotFound();
+            }
+            var fuelPredictorContext = _context.PrixJournalier.Include(p => p.Carburant).Include(p => p.Station).Where(u=>u.IDStation==id);
+            return View(await fuelPredictorContext.ToListAsync());
+        }
+
         // GET: PrixJournaliers/Details/5
         public async Task<IActionResult> Details(int? id)
         {
@@ -49,8 +59,8 @@ namespace FuelPredictor.Controllers
         // GET: PrixJournaliers/Create
         public IActionResult Create()
         {
-            ViewData["IDCarburant"] = new SelectList(_context.Carburant, "Id", "Id");
-            ViewData["IDStation"] = new SelectList(_context.Station, "Id", "Id");
+            ViewData["IDCarburant"] = new SelectList(_context.Carburant, "Id", "TypeCarburant");
+            ViewData["IDStation"] = new SelectList(_context.Station, "Id", "Nom");
             return View();
         }
 
@@ -67,8 +77,8 @@ namespace FuelPredictor.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["IDCarburant"] = new SelectList(_context.Carburant, "Id", "Id", prixJournalier.IDCarburant);
-            ViewData["IDStation"] = new SelectList(_context.Station, "Id", "Id", prixJournalier.IDStation);
+            ViewData["IDCarburant"] = new SelectList(_context.Carburant, "Id", "TypeCarburant", prixJournalier.IDCarburant);
+            ViewData["IDStation"] = new SelectList(_context.Station, "Id", "Nom", prixJournalier.IDStation);
             return View(prixJournalier);
         }
 
@@ -85,8 +95,8 @@ namespace FuelPredictor.Controllers
             {
                 return NotFound();
             }
-            ViewData["IDCarburant"] = new SelectList(_context.Carburant, "Id", "Id", prixJournalier.IDCarburant);
-            ViewData["IDStation"] = new SelectList(_context.Station, "Id", "Id", prixJournalier.IDStation);
+            ViewData["IDCarburant"] = new SelectList(_context.Carburant, "Id", "TypeCarburant", prixJournalier.IDCarburant);
+            ViewData["IDStation"] = new SelectList(_context.Station, "Id", "Nom", prixJournalier.IDStation);
             return View(prixJournalier);
         }
 
@@ -122,7 +132,7 @@ namespace FuelPredictor.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["IDCarburant"] = new SelectList(_context.Carburant, "Id", "Id", prixJournalier.IDCarburant);
+            ViewData["IDCarburant"] = new SelectList(_context.Carburant, "Id", "TypeCarburant", prixJournalier.IDCarburant);
             ViewData["IDStation"] = new SelectList(_context.Station, "Id", "Id", prixJournalier.IDStation);
             return View(prixJournalier);
         }

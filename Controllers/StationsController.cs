@@ -32,6 +32,10 @@ namespace FuelPredictor.Controllers
             return View(await fuelPredictorContext.ToListAsync());
         }
 
+
+
+
+
         // GET: Stations/Details/5
         public async Task<IActionResult> Details(int? id)
         {

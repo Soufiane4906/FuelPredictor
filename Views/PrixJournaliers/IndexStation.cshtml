@@ -1,11 +1,11 @@
 ﻿@model IEnumerable<FuelPredictor.Models.V2.PrixJournalier>
 
 @{
-    ViewData["Title"] = "Index";
-    Layout = "~/Views/Shared/_LayoutGerant.cshtml";
+    ViewData["Title"] = "IndexStation";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Index</h1>
+<h1>IndexStation</h1>
 
 <p>
     <a asp-action="Create">Create New</a>
@@ -38,10 +38,10 @@
                 @Html.DisplayFor(modelItem => item.date)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Station.Nom)
+                @Html.DisplayFor(modelItem => item.Station.Id)
             </td>
             <td>
-                    @Html.DisplayFor(modelItem => item.Carburant.TypeCarburant)
+                @Html.DisplayFor(modelItem => item.Carburant.Id)
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |

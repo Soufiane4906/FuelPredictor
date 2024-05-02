@@ -24,7 +24,7 @@ namespace FuelPredictor.Models.V2
 
         public int? IDCompany { get; set; }
         [ForeignKey("IDCompany")]
-        public Company Company { get; set; }
+        public Company? Company { get; set; }
         public virtual ICollection<PrixJournalier>? PrixJournaliers { get; set; }
 
 
