@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using FuelPredictor.Data;
 using FuelPredictor.Models.V2;
 
-namespace FuelPredictor.Controllers
+namespace FuelPredictor.Areas.SuperAdmin.Controllers
 {
     public class CompaniesController : Controller
     {
@@ -22,9 +22,9 @@ namespace FuelPredictor.Controllers
         // GET: Companies
         public async Task<IActionResult> Index()
         {
-              return _context.Companies != null ? 
-                          View(await _context.Companies.ToListAsync()) :
-                          Problem("Entity set 'FuelPredictorContext.Companies'  is null.");
+            return _context.Companies != null ?
+                        View(await _context.Companies.ToListAsync()) :
+                        Problem("Entity set 'FuelPredictorContext.Companies'  is null.");
         }
 
         // GET: Companies/Details/5
@@ -150,14 +150,14 @@ namespace FuelPredictor.Controllers
             {
                 _context.Companies.Remove(company);
             }
-            
+
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool CompanyExists(int id)
         {
-          return (_context.Companies?.Any(e => e.Id == id)).GetValueOrDefault();
+            return (_context.Companies?.Any(e => e.Id == id)).GetValueOrDefault();
         }
     }
 }

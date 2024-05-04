@@ -8,11 +8,6 @@ using FuelPredictor.Models.Users;
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("FuelPredictorContextConnection") ?? throw new InvalidOperationException("Connection string 'FuelPredictorContextConnection' not found.");
 
-/*builder.Services.AddDbContext<FuelPredictorContext>(options =>
-    options.UseSqlServer(connectionString));
-
-builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
-    .AddEntityFrameworkStores<FuelPredictorContext>();*/
 
 builder.Services.AddDbContext<FuelPredictorContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("FuelPredictorContextConnection") ));
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
@@ -52,12 +47,14 @@ using (var scope = app.Services.CreateScope())
     var dbContext = services.GetRequiredService<FuelPredictorContext>();
     await ContextSeed.SeedRolesAsync(userManager, roleManager);
     await ContextSeed.SeedSuperAdminAsync(userManager, roleManager);
-    ContextSeed.SeedDataAsync(dbContext).Wait();
+    await ContextSeed.SeedDataAsync(dbContext);
 }
+
+
 
 
 app.MapControllerRoute(
     name: "default",
-    pattern: "{controller=Stations}/{action=Index}/{id?}");
+    pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();

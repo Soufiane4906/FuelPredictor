@@ -4,6 +4,7 @@ using FuelPredictor.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FuelPredictor.Migrations
 {
     [DbContext(typeof(FuelPredictorContext))]
-    partial class FuelPredictorContextModelSnapshot : ModelSnapshot
+    [Migration("20240503205055_testt")]
+    partial class testt
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -147,9 +149,6 @@ namespace FuelPredictor.Migrations
                     b.Property<string>("IDGerant")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<int?>("IDVille")
-                        .HasColumnType("int");
-
                     b.Property<double>("Latitude")
                         .HasColumnType("float");
 
@@ -169,25 +168,7 @@ namespace FuelPredictor.Migrations
 
                     b.HasIndex("IDGerant");
 
-                    b.HasIndex("IDVille");
-
                     b.ToTable("Station", "Identity");
-                });
-
-            modelBuilder.Entity("FuelPredictor.Models.V2.Ville", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Ville", "Identity");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -443,15 +424,9 @@ namespace FuelPredictor.Migrations
                         .WithMany("Stations")
                         .HasForeignKey("IDGerant");
 
-                    b.HasOne("FuelPredictor.Models.V2.Ville", "Ville")
-                        .WithMany()
-                        .HasForeignKey("IDVille");
-
                     b.Navigation("Company");
 
                     b.Navigation("Gerant");
-
-                    b.Navigation("Ville");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

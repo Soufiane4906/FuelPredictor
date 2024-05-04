@@ -7,6 +7,14 @@ a.navbar-brand {
   word-break: break-all;
 }
 
+.container {
+    background-image: url('images/background.jpg');
+
+    background-size: cover; /* Cela garantit que l'image de fond couvre tout le conteneur */
+    background-repeat: no-repeat; /* Cela empêche l'image de se répéter */
+    background-position: center; /* Cela centre l'image dans le conteneur */
+}
+
 a {
   color: #0077cc;
 }

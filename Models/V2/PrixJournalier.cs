@@ -11,7 +11,8 @@ namespace FuelPredictor.Models.V2
    
         [Display(Name ="Prix")]
         public float prix { get; set; }
- 
+
+        [DisplayFormat(DataFormatString = "{0:dd-MM-yyyy}", ApplyFormatInEditMode = true)]
         public DateTime date { get; set; }
 
         public int IDStation { get; set; }

@@ -9,6 +9,7 @@ using FuelPredictor.Data;
 using FuelPredictor.Models.V2;
 using FuelPredictor.Models.Users;
 using Microsoft.AspNetCore.Identity;
+using static System.Collections.Specialized.BitVector32;
 
 namespace FuelPredictor.Controllers
 {
@@ -28,13 +29,41 @@ namespace FuelPredictor.Controllers
         public async Task<IActionResult> Index()
         {
             var currentUser = await _userManager.GetUserAsync(User);
-            var fuelPredictorContext = _context.Station.Include(s => s.Gerant).Where(g=>g.IDGerant==currentUser.Id);
+            var fuelPredictorContext = _context.Station.Include(s => s.Gerant).Where(g=>g.IDGerant==currentUser.Id).Include(u=>u.Ville);
             return View(await fuelPredictorContext.ToListAsync());
         }
 
 
+        [HttpPost]
+        public IActionResult GetStations()
+        {
+            int pageSize = int.Parse(Request.Form["length"]);
+            int skip = int.Parse(Request.Form["start"]);
+
+            var searchValue = Request.Form["search[value]"];
+
+            var sortColumn = Request.Form[string.Concat("columns[", Request.Form["order[0][column]"], "][name]")];
+            var sortColumnDirection = Request.Form["order[0][dir]"];
+
+            IQueryable<Station> Station = _context.Station.Where(m => string.IsNullOrEmpty(searchValue)
+                ? true
+                : (m.Adresse.Contains(searchValue) || m.Company.Nom.Contains(searchValue) || m.Company.Nom.Contains(searchValue) ));
+
+            if (!(string.IsNullOrEmpty(sortColumn) && string.IsNullOrEmpty(sortColumnDirection)))
+                Station = Station.OrderBy(u=>u.Adresse);
+
+            var data = Station.Skip(skip).Take(pageSize).ToList();
+
+            var recordsTotal = Station.Count();
+
+            var jsonData = new { recordsFiltered = recordsTotal, recordsTotal, data };
 
 
+
+            
+            return Ok(jsonData);
+
+        }
 
         // GET: Stations/Details/5
         public async Task<IActionResult> Details(int? id)
@@ -59,6 +88,8 @@ namespace FuelPredictor.Controllers
         public IActionResult Create()
         {
             ViewData["IDGerant"] = new SelectList(_context.ApplicationUser, "Id", "Id");
+            ViewData["IDVille"] = new SelectList(_context.Ville, "Id", "Name");
+
             ViewData["IDCompany"] = new SelectList(_context.Companies, "Id", "Name");
             return View();
         }
@@ -68,7 +99,7 @@ namespace FuelPredictor.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Nom,Adresse,Latitude,Longitude,Id")] Station station)
+        public async Task<IActionResult> Create([Bind("Nom,Adresse,Latitude,Longitude,Id , IDVille")] Station station)
         {
             if (ModelState.IsValid)
             {
@@ -90,13 +121,16 @@ namespace FuelPredictor.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-           // ViewData["IDGerant"] = new SelectList(_context.ApplicationUser, "Id", "Id", station.IDGerant);
+            ViewData["IDVille"] = new SelectList(_context.Ville, "Id", "Name", station.IDVille);
+            ViewData["IDCompany"] = new SelectList(_context.Companies, "Id", "Nom", station.IDCompany);
             return View(station);
         }
 
         // GET: Stations/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
+            ViewData["IDVille"] = new SelectList(_context.Ville, "Id", "Name");
+
             if (id == null || _context.Station == null)
             {
                 return NotFound();
@@ -116,8 +150,10 @@ namespace FuelPredictor.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Nom,Adresse,Latitude,Longitude,Id")] Station station)
+        public async Task<IActionResult> Edit(int id, [Bind("Nom,Adresse,Latitude,Longitude,Id , IDVille")] Station station)
         {
+            ViewData["IDVille"] = new SelectList(_context.Ville, "Id", "Name", station.IDVille);
+
             if (id != station.Id)
             {
                 return NotFound();

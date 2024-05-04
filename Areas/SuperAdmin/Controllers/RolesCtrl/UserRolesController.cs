@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using FuelPredictor.Enums;
 using FuelPredictor.Models.Users;
 
-namespace FuelPredictor.Controllers.RolesCtrl
+namespace FuelPredictor.Areas.SuperAdmin.Controllers.RolesCtrl
 {
     public class UserRolesController : Controller
     {
@@ -46,7 +46,7 @@ namespace FuelPredictor.Controllers.RolesCtrl
             ViewBag.UserName = user.UserName;
             var model = new List<ManageUserRolesViewModel>();
             var roles = await _roleManager.Roles.ToListAsync();
-          
+
             foreach (var role in roles)
             {
                 var userRolesViewModel = new ManageUserRolesViewModel

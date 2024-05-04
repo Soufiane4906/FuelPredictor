@@ -5,7 +5,7 @@
         "serverSide": true,
         "filter": true,
         "ajax": {
-            "url": "/Bateaux/GetBateaux",
+            "url": "/Stations/GetStations",
             "type": "POST",
             "datatype" : "json",
 

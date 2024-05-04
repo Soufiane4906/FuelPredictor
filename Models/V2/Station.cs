@@ -1,6 +1,7 @@
 ﻿using FuelPredictor.Models.Users;
 using System.ComponentModel.DataAnnotations.Schema;
 using NetTopologySuite.Geometries;
+using System.ComponentModel.DataAnnotations;
 
 
 namespace FuelPredictor.Models.V2
@@ -13,8 +14,13 @@ namespace FuelPredictor.Models.V2
         public string Adresse { get; set; }
         public double Latitude { get; set; }
         public double Longitude { get; set; }
-/*        public Point Location { get; set; }
-*/
+
+        [Display(Name ="Ville")]
+        public int? IDVille { get; set; }
+        [ForeignKey("IDVille")]
+        public Ville? Ville { get; set; }
+        /*        public Point Location { get; set; }
+        */
         // Propriété de navigation vers l'utilisateur (gerant)
 
 

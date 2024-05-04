@@ -1,8 +1,13 @@
 ﻿@model FuelPredictor.Models.V2.Station
+<style>
+    #Stations {
+        text-decoration: underline;
+    }
+</style>
 
 @{
     ViewData["Title"] = "Create";
-    Layout = "~/Views/Shared/_LayoutGerant.cshtml";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <h1>Create</h1>
@@ -33,9 +38,17 @@
                 <input asp-for="Longitude" class="form-control" />
                 <span asp-validation-for="Longitude" class="text-danger"></span>
             </div>
-       @*     <div class="form-group">
+            <div class="form-group">
+                <label asp-for="IDVille" class="control-label"></label>
+                <select asp-for="IDVille" class ="form-control" asp-items="ViewBag.IDVille"></select>
+            </div>
+@*             <div class="form-group">
+                <label asp-for="IDGerant" class="control-label"></label>
+                <select asp-for="IDGerant" class ="form-control" asp-items="ViewBag.IDGerant"></select>
+            </div> *@
+  @*           <div class="form-group">
                 <label asp-for="IDCompany" class="control-label"></label>
-                <select asp-for="IDCompany" class="form-control" asp-items="ViewBag.IDCompany"></select>
+                <select asp-for="IDCompany" class ="form-control" asp-items="ViewBag.IDCompany"></select>
             </div> *@
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
@@ -45,6 +58,6 @@
 </div>
 
 <div>
-    <a class="btn btn-outline-dark" asp-action="Index"><--Retour</a>
+    <a asp-action="Index">Back to List</a>
 </div>
 

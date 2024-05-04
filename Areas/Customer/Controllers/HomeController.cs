@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Diagnostics;
 
-namespace FuelPredictor.Controllers
+namespace FuelPredictor.Areas.Customer.Controllers
 {
     public class HomeController : Controller
     {
@@ -24,7 +24,7 @@ namespace FuelPredictor.Controllers
             // Inside your method
             var stations = await _context.Station.ToListAsync();
 
- 
+
             return View(await _context.Station.ToListAsync());
         }
         public IActionResult Privacy()

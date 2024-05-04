@@ -38,14 +38,39 @@ namespace FuelPredictor.Data
             var africaCompany = companies.FirstOrDefault(c => c.Nom == "Africa");
             var shellCompany = companies.FirstOrDefault(c => c.Nom == "Shell");
 
+            var gerant = dbContext.ApplicationUser.FirstOrDefault(u => u.Id.Equals("09658bad-fc4e-413d-8a4f-01514178daeb"));
+
             var stations = new List<Station>
         {
-            new Station { Nom = "Station 1", Adresse = "123 Rue ABC", Latitude = 31.6352, Longitude = -7.9928, Company = africaCompany },
-            new Station { Nom = "Station 2", Adresse = "456 Avenue XYZ", Latitude = 33.5731, Longitude = -7.5898, Company = shellCompany },
+            new Station { Nom = "Station 4", Adresse = "123 Rue ABC", Latitude = 31.6352, Longitude = -7.9928, Company = africaCompany , Gerant = gerant , IDGerant="09658bad-fc4e-413d-8a4f-01514178daeb"},
+            new Station { Nom = "Station 2", Adresse = "456 Avenue XYZ", Latitude = 33.5731, Longitude = -7.5898, Company = shellCompany ,  Gerant = gerant , IDGerant="09658bad-fc4e-413d-8a4f-01514178daeb" },
                 // Add more stations as needed
         };
+            var station = new Station { Nom = "Station 5", Adresse = "123 Rue ABC", Latitude = 31.6352, Longitude = -7.9928, Company = africaCompany, Gerant = gerant , IDGerant = "09658bad-fc4e-413d-8a4f-01514178daeb" };
+
+
+            // Supposons que dbContext soit votre contexte de base de données Entity Framework
+
+            var prixJournaliers = new List<PrixJournalier>();
+
+            DateTime dateDebut = new DateTime(DateTime.Now.Year, 5, 1); // Date de début, 1er mai
+            DateTime dateFin = new DateTime(DateTime.Now.Year, 5, 15);  // Date de fin, 15 mai
+
+            for (DateTime date = dateDebut; date <= dateFin; date = date.AddDays(1))
+            {
+                PrixJournalier nouveauPrix = new PrixJournalier
+                {
+                    Carburant = dbContext.Carburant.FirstOrDefault(u => u.Id == 2),
+                    Station = station, // Assurez-vous que "station" est déjà défini
+                    date = date
+                };
+
+                prixJournaliers.Add(nouveauPrix);
+            }
+
 
             await dbContext.Station.AddRangeAsync(stations);
+            await dbContext.PrixJournalier.AddRangeAsync(prixJournaliers);
             await dbContext.SaveChangesAsync();
         }
 

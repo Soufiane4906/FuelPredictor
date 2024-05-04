@@ -18,7 +18,7 @@
         <nav class="navbar navbar-expand-lg navbar-dark " style="background-color: green; margin-bottom: 10px">
             <div class="container-fluid">
                 <a class="navbar-brand" href="#">
-                    <img src="@Url.Content("~/images/em.jpg")" style=" height:40px;width:70px" alt="Image 1" />
+                    <img   src="@Url.Content("~/images/background.jpg")" style=" height:40px;width:70px;border-radius:100px;" alt="Image 1" />
                 </a>
 
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#main_nav" aria-expanded="false" aria-label="Toggle navigation">
@@ -29,43 +29,38 @@
                     <ul class="navbar-nav me-auto">
 
                         <li class="nav-item active">
-                            <a class="nav-link text-white" asp-area="Customer" asp-controller="Home" asp-action="Index">Home</a>
+                            <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
                         @if (User.IsInRole("SuperAdmin"))
                         {
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">  Admin Page </a>
-                                <ul class="dropdown-menu">
-                                    <li>
-                                        <a class="dropdown-item" href="#"> Gestion des roles </a>
-                                        <ul class="submenu dropdown-menu">
-                                            <li><a class="dropdown-item" asp-area="" asp-controller="RoleManager"> Roles </a></li>
-                                            <li><a class="dropdown-item" asp-area="" asp-controller="UserRoles">Utilisateurs</a></li>
-
-                                        </ul>
+                           
+                          
+                                <ul >
+                                 
+                                    
+                        
+                                            <ul><a class="nav-link text-white" asp-area="" asp-controller="RoleManager"> Roles </a></ul>
+                                            <ul><a class="nav-link text-white" asp-area="" asp-controller="UserRoles">Utilisateurs</a></ul>
+                    
 
 
 
 
                                 </ul>
-                            </li>
                         }
 
 
 
                         @if (User.IsInRole("Gerant"))
                         {
-                            <li class="nav-item dropdown">
-                                <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">  Gerant Page </a>
-                                <ul class="dropdown-menu">
-                                
-                                            <li><a class="dropdown-item" asp-area="" asp-controller="Companies" asp-action="Index"> Sociétés </a></li>
-                                            <li><a class="dropdown-item" asp-area="" asp-controller="Stations" asp-action="Index"> Stations </a></li>
-                                            <li><a class="dropdown-item" asp-area="" asp-controller="Carburants" asp-action="Index"> Carburants </a></li>
-                                    <li><a class="dropdown-item" asp-area="" asp-controller="PrixJournaliers" asp-action="Index"> PrixJournaliers </a></li>
-                              </ul>
+
+
+                            <ul><a class="nav-link text-white" id="Companies" asp-area="" asp-controller="Companies" asp-action="Index"> Sociétés </a></ul>
+                            <ul><a class="nav-link text-white" id="Stations" asp-area="" asp-controller="Stations" asp-action="Index"> Stations </a></ul>
+                            <ul><a class="nav-link text-white" id="Carburants" asp-area="" asp-controller="Carburants" asp-action="Index"> Carburants </a></ul>
+                            <ul><a class="nav-link text-white" id="PrixJournaliers" asp-area="" asp-controller="PrixJournaliers" asp-action="Index"> PrixJournaliers </a></ul>
+                            
               
-                            </li>
                         }
 
 

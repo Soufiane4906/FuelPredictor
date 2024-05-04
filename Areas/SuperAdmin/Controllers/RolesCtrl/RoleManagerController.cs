@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace FuelPredictor.Controllers.RolesCtrl
+namespace FuelPredictor.Areas.SuperAdmin.Controllers.RolesCtrl
 {
     public class RoleManagerController : Controller
     {
