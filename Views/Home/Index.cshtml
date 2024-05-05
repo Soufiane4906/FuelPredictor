@@ -5,7 +5,13 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h4>Liste des prix des stations au @DateTime.Now.Date</h4>
+<h4>Liste des prix des stations au @DateTime.Now.TimeOfDay</h4>
+<style>
+    #Home {
+        text-decoration: underline;
+    }
+</style>
+
 
 @*<p>
     <a asp-action="Create">Create New</a>

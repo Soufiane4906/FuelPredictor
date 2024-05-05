@@ -29,7 +29,7 @@ namespace FuelPredictor.Controllers
         public async Task<IActionResult> Index()
         {
             var currentUser = await _userManager.GetUserAsync(User);
-            var fuelPredictorContext = _context.Station.Include(s => s.Gerant).Where(g=>g.IDGerant==currentUser.Id).Include(u=>u.Ville);
+            var fuelPredictorContext = _context.Station.Include(u=>u.Ville).Include(s => s.Gerant).Where(g=>g.IDGerant==currentUser.Id);
             return View(await fuelPredictorContext.ToListAsync());
         }
 
