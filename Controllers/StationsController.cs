@@ -10,6 +10,7 @@ using FuelPredictor.Models.V2;
 using FuelPredictor.Models.Users;
 using Microsoft.AspNetCore.Identity;
 using static System.Collections.Specialized.BitVector32;
+using FuelPredictor.Models.Dto;
 
 namespace FuelPredictor.Controllers
 {
@@ -24,6 +25,9 @@ namespace FuelPredictor.Controllers
             _userManager = userManager;
 
         }
+
+
+
 
         // GET: Stations
         public async Task<IActionResult> Index()
@@ -64,34 +68,29 @@ namespace FuelPredictor.Controllers
             }
 
             var stations = stationsQuery
-                .Skip(skip)
-                .Take(pageSize)
-                .Select(s => new {
-                    nom = s.Nom,
-                    adresse = s.Adresse,
-                    latitude = s.Latitude,
-                    longitude = s.Longitude,
-                    idVille = s.IDVille,
-                    idCompany = s.IDCompany,
-                    ville = s.Ville != null ? s.Ville.Name : null,
-                    company = s.Company != null ? s.Company.Nom : null ,
-                    prixGasoil = s.PrixJournaliers
-                            .Select(p => new {
-                                carburant = p.Carburant != null ? p.Carburant.TypeCarburant : null,
-                                prix = p.prix
-                            }),
-                    prixEssence = s.PrixJournaliers
-                            .Select(p => new {
-                                carburant = p.Carburant != null ? p.Carburant.TypeCarburant : null,
-                                prix = p.prix
-                            })
+        .Skip(skip)
+        .Take(pageSize)
+        .Select(s => new StationDto
+        {
+            Nom = s.Nom,
+            Adresse = s.Adresse,
+            Latitude = s.Latitude,
+            Longitude = s.Longitude,
+            IdVille = (int)s.IDVille,
+            IdCompany = (int)s.IDCompany,
+            Ville = s.Ville != null ? s.Ville.Name : null,
+            Company = s.Company != null ? s.Company.Nom : null,
+            PrixGasoilAujourdhui = s.PrixJournaliers
+                .Where(p => p.Carburant.TypeCarburant == "Diesel" && p.date.Date == DateTime.Today)
+                .Select(p => p.prix)
+                .FirstOrDefault(),
+            PrixEssenceAujourdhui = s.PrixJournaliers
+                .Where(p => p.Carburant.TypeCarburant == "Essence" && p.date.Date == DateTime.Today)
+                .Select(p => p.prix)
+                .FirstOrDefault()
+        })
+        .ToList();
 
-               
-
-
-                            })
-
-                .ToList();
 
             var recordsTotal = _context.Station.Count();
 

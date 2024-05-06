@@ -6,6 +6,8 @@
     <title>@ViewData["Title"] - FuelPredictor</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" asp-append-version="true" />
     <link rel="stylesheet" href="~/WebApplication1.styles.css" asp-append-version="true" />
 </head>
@@ -29,7 +31,7 @@
                     <ul class="navbar-nav me-auto">
 
                         <li class="nav-item active">
-                            <a class="nav-link text-white"  id="Home" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                            <a class="nav-link text-white"  id="Home" asp-area="" asp-controller="Home" asp-action="Index">Fuel Predictor</a>
                         </li>
                         @if (User.IsInRole("SuperAdmin"))
                         {
@@ -131,6 +133,9 @@
     <script src="~/lib/jquery/dist/jquery.min.js" asp-append-version="true"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js" asp-append-version="true"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js" asp-append-version="true"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     @await RenderSectionAsync("Scripts", required: false)
 </body>

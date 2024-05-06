@@ -11,7 +11,7 @@ namespace FuelPredictor.Models.Users
         public string LastName { get; set; }
         public int UsernameChangeLimit { get; set; } = 2;
         public byte[] ProfilePicture { get; set; }
-        public virtual List<Station>? Stations { get; set; }
+        public virtual ICollection<Station>? Stations { get; set; }
 
     }
 }

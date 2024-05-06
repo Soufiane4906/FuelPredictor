@@ -7,9 +7,11 @@ a.navbar-brand {
   word-break: break-all;
 }
 
-a {
-  color: #0077cc;
-}
+.btn-success {
+    display: ruby-text;
+  
+   }
+
 
 .btn-primary {
   color: #fff;
@@ -45,4 +47,27 @@ button.accept-policy {
   width: 100%;
   white-space: nowrap;
   line-height: 60px;
+}
+/* Styles pour le bouton de suppression */
+#btn-delete {
+    background-color: #dc3545; /* Couleur de fond rouge */
+    color: #fff; /* Texte blanc */
+}
+
+/* Styles pour le bouton de création */
+#btn-create {
+    background-color: #28a745; /* Couleur de fond verte */
+    color: #fff; /* Texte blanc */
+}
+
+/* Styles pour le bouton de détails */
+#btn-details {
+    background-color: #17a2b8; /* Couleur de fond bleue */
+    color: #fff; /* Texte blanc */
+}
+
+/* Styles pour le bouton d'édition */
+#btn-edit {
+    background-color: #ffc107; /* Couleur de fond jaune */
+    color: #212529; /* Texte noir */
 }

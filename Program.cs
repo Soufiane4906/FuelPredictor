@@ -4,8 +4,15 @@ using FuelPredictor.Data;
 using FuelPredictor.Models;
 using System.Configuration;
 using FuelPredictor.Models.Users;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddAutoMapper(typeof(IStartup));
+
+
+
 var connectionString = builder.Configuration.GetConnectionString("FuelPredictorContextConnection") ?? throw new InvalidOperationException("Connection string 'FuelPredictorContextConnection' not found.");
 
 
@@ -19,6 +26,8 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
+
+
 
 
 var app = builder.Build();

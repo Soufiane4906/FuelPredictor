@@ -2,6 +2,41 @@ html {
   font-size: 14px;
 }
 
+
+.btn-success {
+    display: ruby-text;
+}
+
+@media (min-width: 768px) {
+    .col-md-4 {
+        flex: 1 0 auto !important;
+    }
+}
+
+/* Styles pour le bouton de suppression */
+        #btn-delete {
+    background-color: #dc3545; /* Couleur de fond rouge */
+    color: #fff; /* Texte blanc */
+}
+
+/* Styles pour le bouton de création */
+#btn-create {
+    background-color: #28a745; /* Couleur de fond verte */
+    color: #fff; /* Texte blanc */
+}
+
+/* Styles pour le bouton de détails */
+#btn-details {
+    background-color: #17a2b8; /* Couleur de fond bleue */
+    color: #fff; /* Texte blanc */
+}
+
+/* Styles pour le bouton d'édition */
+#btn-edit {
+    background-color: #ffc107; /* Couleur de fond jaune */
+    color: #212529; /* Texte noir */
+}
+
 @media (min-width: 768px) {
   html {
     font-size: 16px;

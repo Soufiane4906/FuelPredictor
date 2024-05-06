@@ -1,28 +1,16 @@
-﻿@model IEnumerable<FuelPredictor.Models.V2.Station>
+﻿@model List<FuelPredictor.Models.Dto.StationDto>
 
 @{
     ViewData["Title"] = "Home Page";
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h4 style="text-align:center;">Liste des prix des stations au @DateTime.Now.TimeOfDay</h4>
+<h4 style="text-align:center;">Liste des prix des stations au @DateTime.Now.Date.ToString("dd/MM/yyyy")</h4>
 <style>
     #Home {
         text-decoration: underline;
     }
 </style>
-
-
-@*<p>
-    <a asp-action="Create">Create New</a>
-</p>*@
-
-
-
-
-
-
-
 
 
 
@@ -33,12 +21,59 @@
 <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
 
 
-<div class="container" style="margin-top:25px;">
-    <!-- Left column for the map -->
 
+<div class="container" style="margin-top:25px; background-image: url('~/images/back.jpg'); background-size: cover;">
+    <!-- Left column for the map -->
     <div class="row">
         <div class="col-5">
             <div id="map" style="height: 400px;"></div>
+        </div>
+        
+        <div class="col-7" id="DetailStation">
+            <canvas id="chart"></canvas>
+
+            <script>
+                // Données statiques pour les étiquettes (dates) et les prix
+                const dates = ["2024-05-01", "2024-05-02", "2024-05-03", "2024-05-04", "2024-05-05"];
+                const prices = [14.56, 15.0, 14.56, 12.56, 14.56];
+
+                // Créer le graphique
+                var ctx = document.getElementById('chart').getContext('2d');
+                var myChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: dates,
+                        datasets: [{
+                            label: 'Prix Journaliers',
+                            data: prices,
+                            fill: false,
+                            borderColor: 'rgb(75, 192, 192)',
+                            tension: 0.1
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            x: {
+                                type: 'time',
+                                time: {
+                                    unit: 'day'
+                                }
+                            },
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: 'Prix'
+                                }
+                            }
+                        }
+                    }
+                });
+            </script>
+
+
+
+       
+            <div id="prediction"></div>
         </div>
        </div>
 
@@ -57,6 +92,7 @@
                                 <th scope="col">Adresse</th>
                                 <th scope="col">Gasoil Price</th>
                                 <th scope="col">Diesel Price</th>
+                                <th scope="col"></th>
                                 <th scope="col"></th>
                             </tr>
                         </thead>
@@ -94,6 +130,8 @@
     <script src="~/lib/datatables/js/datatables.bootstrap4.js"></script>
     <script src="~/lib/datatables/js/datatables.bootstrap4.min.js"></script>
     <script src="~/js/BateauxDataTable.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js" asp-append-version="true"></script>
+
     <script>
         $(document).ready(function () {
             $('#stationsTable').DataTable({
@@ -109,9 +147,26 @@
                     { "data": "company", "name": "Company", "autowidth": true },
                     { "data": "ville", "name": "Ville", "autowidth": true },
                     { "data": "adresse", "name": "Adresse", "autowidth": true },
-                    { "data": "latitude", "name": "Latitude", "autowidth": true },
-                    { "data": "longitude", "name": "Longitude", "autowidth": true },
-                   
+                    {
+                        "data": "prixGasoilAujourdhui",
+                        "name": "prixGasoilAujourdhui",
+                        "autowidth": true,
+                        "type": "num", // Définit le type de données comme numérique pour permettre le tri numérique
+                        "render": $.fn.dataTable.render.number(',', '.', 2) // Formate les prix avec 2 décimales
+                    },
+                    {
+                        "data": "prixEssenceAujourdhui",
+                        "name": "prixEssenceAujourdhui",
+                        "autowidth": true,
+                        "type": "num", // Définit le type de données comme numérique pour permettre le tri numérique
+                        "render": $.fn.dataTable.render.number(',', '.', 2) // Formate les prix avec 2 décimales
+                    },
+                    {
+                        "data": null,
+                        "render": function (data, type, row) {
+                            return `<button class="btn btn-outline-primary" onclick="showStationOnMap(${row.latitude}, ${row.longitude})">Voir sur la carte</button>`;
+                        }
+                    },
                     // Ajoutez d'autres colonnes si nécessaire
                     {
                         "data": null,
@@ -125,12 +180,79 @@
                 }
             });
         });
-    </script>
-}
+
+        /*
+
+        function fetchPrixJournaliers(stationId) {
+            $.ajax({
+                url: '/Home/GetPrixJournaliers',
+                type: 'GET',
+                data: { stationId: stationId },
+                success: function (data) {
+                    // Mettre à jour les attributs data
+                    $('#chart').attr('data-dates', JSON.stringify(data.dates));
+                    $('#chart').attr('data-prices', JSON.stringify(data.prices));
+
+                    // Créer ou mettre à jour le graphique
+                    renderChart();
+                },
+                error: function (xhr, status, error) {
+                    console.error(error);
+                }
+            });
+        }
+
+
+        function renderChart() {
+            var canvas = document.getElementById('chart');
+            var dates = JSON.parse(canvas.getAttribute('data-dates'));
+            var prices = JSON.parse(canvas.getAttribute('data-prices'));
+
+            var ctx = canvas.getContext('2d');
+            var myChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: dates,
+                    datasets: [{
+                        label: 'Prix Journaliers',
+                        data: prices,
+                        fill: false,
+                        borderColor: 'rgb(75, 192, 192)',
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    scales: {
+                        x: {
+                            type: 'time',
+                            time: {
+                                unit: 'day'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Prix'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        */
+
+
+    function showStationOnMap(latitude, longitude) {
+        map.setView([latitude, longitude], 20);
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth' // pour un défilement fluide, utilisez 'smooth'
+        });
+    }
 
 
 
-<script>
+
     var map = L.map('map').setView([33.5731, -7.5898], 13); // set initial position and zoom level for Casablanca
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -143,17 +265,24 @@
 
     // Add markers for each station
 
-    for(i in jsModel){
+    for (i in jsModel) {
+        var item = jsModel[i];
+        var popupContent = '<div style="text-align:center;"><strong>' + item.nom + '</strong><br>' +
+            'Adresse: ' + item.adresse + '<br>' +
+            'Ville: ' + item.ville + '<br>' +
+            'Société: ' + item.company + '<br>' +
+            'Prix Gasoil aujourd\'hui: ' + item.prixGasoilAujourdhui + '<br>' +
+            'Prix Essence aujourd\'hui: ' + item.prixEssenceAujourdhui + '<br>' +
+            
+            '<button onclick="fetchPrixJournaliers(' + item.id + ')" class="btn btn-outline-success">Afficher les prix journaliers</button>'+
+            '<a href="/PrixJournaliers/IndexStation/' + item.id + '" class="btn btn-outline-success">Liste des prix</a></div>';
+        L.marker([item.latitude, item.longitude]).addTo(map)
+            .bindPopup(popupContent)
+            .openPopup();
+    }
 
-        item=jsModel[i]
-        L.marker([item.latitude , item.longitude]).addTo(map)
-        .bindPopup(item.nom+'<br>' +item.adresse) 
-        .openPopup();
-        
-    };
 
-</script>
-<script>
+
     function searchTable() {
         // Déclaration des variables
         var input, filter, table, tr, td, i, txtValue;
@@ -176,12 +305,12 @@
         }
     }
 </script>
-<style>
-    /* Define a layout with two columns */
 
 
-</style>
 
+
+
+}
 
 
 
