@@ -29,7 +29,7 @@ namespace FuelPredictor.Controllers
         public async Task<IActionResult> Index()
         {
             var currentUser = await _userManager.GetUserAsync(User);
-            var fuelPredictorContext = _context.Station.Include(u=>u.Ville).Include(s => s.Gerant).Where(g=>g.IDGerant==currentUser.Id);
+            var fuelPredictorContext = _context.Station.Include(u=>u.Ville).Where(g=>g.IDGerant==currentUser.Id);
             return View(await fuelPredictorContext.ToListAsync());
         }
 
@@ -45,25 +45,62 @@ namespace FuelPredictor.Controllers
             var sortColumn = Request.Form[string.Concat("columns[", Request.Form["order[0][column]"], "][name]")];
             var sortColumnDirection = Request.Form["order[0][dir]"];
 
-            IQueryable<Station> Station = _context.Station.Where(m => string.IsNullOrEmpty(searchValue)
-                ? true
-                : (m.Adresse.Contains(searchValue) || m.Company.Nom.Contains(searchValue) || m.Company.Nom.Contains(searchValue) ));
+            IQueryable<Station> stationsQuery = _context.Station.Include(s => s.Ville).Include(s => s.Company);
+
+            if (!string.IsNullOrEmpty(searchValue))
+            {
+                stationsQuery = stationsQuery.Where(m =>
+                    m.Adresse.Contains(searchValue) ||
+                    m.Company.Nom.Contains(searchValue) ||
+                    m.Ville.Name.Contains(searchValue)); // Corrected to use Ville instead of m.Ville.Name
+            }
 
             if (!(string.IsNullOrEmpty(sortColumn) && string.IsNullOrEmpty(sortColumnDirection)))
-                Station = Station.OrderBy(u=>u.Adresse);
+            {
+                // Sorting logic, assuming sortColumn is the name of the column you want to sort by
+                stationsQuery = sortColumnDirection == "asc"
+                    ? stationsQuery.OrderBy(m => EF.Property<object>(m, sortColumn))
+                    : stationsQuery.OrderByDescending(m => EF.Property<object>(m, sortColumn));
+            }
 
-            var data = Station.Skip(skip).Take(pageSize).ToList();
+            var stations = stationsQuery
+                .Skip(skip)
+                .Take(pageSize)
+                .Select(s => new {
+                    nom = s.Nom,
+                    adresse = s.Adresse,
+                    latitude = s.Latitude,
+                    longitude = s.Longitude,
+                    idVille = s.IDVille,
+                    idCompany = s.IDCompany,
+                    ville = s.Ville != null ? s.Ville.Name : null,
+                    company = s.Company != null ? s.Company.Nom : null ,
+                    prixGasoil = s.PrixJournaliers
+                            .Select(p => new {
+                                carburant = p.Carburant != null ? p.Carburant.TypeCarburant : null,
+                                prix = p.prix
+                            }),
+                    prixEssence = s.PrixJournaliers
+                            .Select(p => new {
+                                carburant = p.Carburant != null ? p.Carburant.TypeCarburant : null,
+                                prix = p.prix
+                            })
 
-            var recordsTotal = Station.Count();
-
-            var jsonData = new { recordsFiltered = recordsTotal, recordsTotal, data };
+               
 
 
+                            })
 
-            
+                .ToList();
+
+            var recordsTotal = _context.Station.Count();
+
+            var jsonData = new { recordsFiltered = stations.Count(), recordsTotal, data = stations };
+
             return Ok(jsonData);
-
         }
+
+
 
         // GET: Stations/Details/5
         public async Task<IActionResult> Details(int? id)

@@ -5,7 +5,7 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-<h4>Liste des prix des stations au @DateTime.Now.TimeOfDay</h4>
+<h4 style="text-align:center;">Liste des prix des stations au @DateTime.Now.TimeOfDay</h4>
 <style>
     #Home {
         text-decoration: underline;
@@ -52,9 +52,9 @@
                         <thead>
                             <tr>
                                 <th scope="col">Station</th>
+                                <th scope="col">Société</th>
                                 <th scope="col">Ville</th>
                                 <th scope="col">Adresse</th>
-                                <th scope="col">Société</th>
                                 <th scope="col">Gasoil Price</th>
                                 <th scope="col">Diesel Price</th>
                                 <th scope="col"></th>
@@ -92,7 +92,8 @@
     <script src="~/lib/datatables/js/dataTables.bootstrap4.js"></script>
     <script src="~/lib/datatables/js/jquery.dataTables.js"></script>
     <script src="~/lib/datatables/js/datatables.bootstrap4.js"></script>
-    <script src="~/lib/datatables/js/datatables.bootstrap4.min.js"></script> <script src="~/js/BateauxDataTable.js"></script>
+    <script src="~/lib/datatables/js/datatables.bootstrap4.min.js"></script>
+    <script src="~/js/BateauxDataTable.js"></script>
     <script>
         $(document).ready(function () {
             $('#stationsTable').DataTable({
@@ -102,13 +103,10 @@
                     "type": "POST",
                     "datatype": "json"
                 },
-                "columnDefs": [{
-                    "targets": [0],
-                    "visible": false,
-                    "searchable": false
-                }],
+      
                 "columns": [
                     { "data": "nom", "name": "Nom", "autowidth": true },
+                    { "data": "company", "name": "Company", "autowidth": true },
                     { "data": "ville", "name": "Ville", "autowidth": true },
                     { "data": "adresse", "name": "Adresse", "autowidth": true },
                     { "data": "latitude", "name": "Latitude", "autowidth": true },
@@ -118,13 +116,13 @@
                     {
                         "data": null,
                         "render": function (data, type, row) {
-                            return `
-                                                        <a href="/PrixJournaliers/IndexStation/${row.id}">Historique des Prix</a> |
-
-                                    `;
+                            return `<a href="/PrixJournaliers/IndexStation/${row.id}">Historique des Prix</a>`;
                         }
                     }
-                ]
+                ],
+                "initComplete": function (settings, json) {
+                    console.log(json); // Log the received data
+                }
             });
         });
     </script>
@@ -149,7 +147,7 @@
 
         item=jsModel[i]
         L.marker([item.latitude , item.longitude]).addTo(map)
-        .bindPopup(item.nom+'<br>' +item.adresse)
+        .bindPopup(item.nom+'<br>' +item.adresse) 
         .openPopup();
         
     };
