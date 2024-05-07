@@ -43,7 +43,9 @@ namespace FuelPredictor.Areas.Customer.Controllers
     .Where(p => p.Carburant.TypeCarburant == "Essence" && p.date.Date == DateTime.Today)
     .Select(p => p.prix)
     .FirstOrDefault()
-            })
+            }
+            
+            )
 .ToListAsync();
 
       
