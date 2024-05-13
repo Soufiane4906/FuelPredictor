@@ -3,6 +3,11 @@
 @{
     ViewData["Title"] = "IndexStation";
     Layout = "~/Views/Shared/_Layout.cshtml";
+ 
+    var stationList = ViewData["StationList"] ;
+    var carburantList = ViewData["CarburantList"] ;
+
+
 }
 <style>
     #PrixJournaliers {
@@ -13,7 +18,9 @@
 <h1>IndexStation</h1>
 
 <p>
-    <a class="btn btn-outline-info" asp-action="Create">Create New</a>
+    <button type="button" class="btn btn-outline-info" id="btnOpenModal" data-toggle="modal" data-target="#createModal">
+        Create New
+    </button>
 </p>
 <table class="table table-success table-striped table-hover ">
     <thead>
@@ -57,3 +64,54 @@
 }
     </tbody>
 </table>
+<!-- Modal -->
+<div class="modal fade" id="createModal" tabindex="-1" role="dialog" aria-labelledby="createModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createModalLabel">Add New Price</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Include the Create.cshtml partial view here -->
+                @Html.Partial("Create", new FuelPredictor.Models.V2.PrixJournalier())
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script>
+        $(document).ready(function () {
+            // Lorsque le bouton "Create New" est cliqué, afficher le modal
+            $('#btnOpenModal').click(function () {
+                $('#createModal').modal('show');
+            });
+
+            // Lorsque le formulaire de création est soumis
+            $('#createModal form').submit(function (e) {
+                e.preventDefault(); // Empêcher le comportement par défaut du formulaire
+
+                // Envoyer le formulaire en AJAX
+                $.ajax({
+                    url: $(this).attr('action'),
+                    type: 'POST',
+                    data: $(this).serialize(), // Sérialiser les données du formulaire
+                    success: function (data) {
+                        // Si la création est réussie, actualiser la page ou effectuer d'autres actions nécessaires
+                        location.reload(); // Actualiser la page après la création
+                    },
+                    error: function (xhr, status, error) {
+                        // En cas d'erreur, afficher un message d'erreur à l'utilisateur ou effectuer d'autres actions nécessaires
+                        console.error(error); // Afficher l'erreur dans la console du navigateur
+                    }
+                });
+            });
+        });
+
+    </script>
+
+
+}

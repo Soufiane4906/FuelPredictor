@@ -48,6 +48,7 @@ namespace FuelPredictor.Controllers
         // GET: Carburants/Create
         public IActionResult Create()
         {
+
             return View();
         }
 

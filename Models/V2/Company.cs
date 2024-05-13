@@ -1,4 +1,6 @@
-﻿namespace FuelPredictor.Models.V2
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace FuelPredictor.Models.V2
 {
     public class Company
     {
@@ -15,8 +17,9 @@
         public string Telephone { get; set; } // Numéro de téléphone de contact de la compagnie
 
         public virtual ICollection<Station>? Stations { get; set; }
-
-        public byte[]? Image { get; set; }
+        [NotMapped]
+        public IFormFile photo { get; set; }
+        public string? PhotoPath { get; set; }
 
     }
 

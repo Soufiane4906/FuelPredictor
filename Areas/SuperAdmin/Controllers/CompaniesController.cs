@@ -7,16 +7,19 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using FuelPredictor.Data;
 using FuelPredictor.Models.V2;
+using Microsoft.AspNetCore.Hosting;
 
 namespace FuelPredictor.Areas.SuperAdmin.Controllers
 {
     public class CompaniesController : Controller
     {
         private readonly FuelPredictorContext _context;
+        private readonly IWebHostEnvironment _HostingEnvironment;
 
-        public CompaniesController(FuelPredictorContext context)
+        public CompaniesController(FuelPredictorContext context, IWebHostEnvironment __HostingEnvironment)
         {
             _context = context;
+            _HostingEnvironment = __HostingEnvironment;
         }
 
         // GET: Companies
@@ -56,10 +59,26 @@ namespace FuelPredictor.Areas.SuperAdmin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Nom,Pays,Adresse,Email,Telephone,Image")] Company company)
+
+        public async Task<IActionResult> Create([Bind("Id,Nom,Pays,Adresse,Email,Telephone,photo")] Company company)
         {
+
             if (ModelState.IsValid)
             {
+                if (company.photo != null && company.photo.Length > 0)
+                {
+                    var uploadsFolder = Path.Combine(_HostingEnvironment.WebRootPath, "images", "uploads");
+                    var uniqueFileName = Guid.NewGuid().ToString() + "_" + company.photo.FileName;
+                    var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await company.photo.CopyToAsync(stream);
+                    }
+
+                    company.PhotoPath = "/uploads/" + uniqueFileName;
+                }
+
                 _context.Add(company);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -88,7 +107,7 @@ namespace FuelPredictor.Areas.SuperAdmin.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Nom,Pays,Adresse,Email,Telephone,Image")] Company company)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Nom,Pays,Adresse,Email,Telephone,photo")] Company company)
         {
             if (id != company.Id)
             {
@@ -97,26 +116,28 @@ namespace FuelPredictor.Areas.SuperAdmin.Controllers
 
             if (ModelState.IsValid)
             {
-                try
+                if (company.photo != null && company.photo.Length > 0)
                 {
-                    _context.Update(company);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!CompanyExists(company.Id))
+                    var uploadsFolder = Path.Combine(_HostingEnvironment.WebRootPath, "images", "uploads");
+                    var uniqueFileName = Guid.NewGuid().ToString() + "_" + company.photo.FileName;
+                    var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                    using (var stream = new FileStream(filePath, FileMode.Create))
                     {
-                        return NotFound();
+                        await company.photo.CopyToAsync(stream);
                     }
-                    else
-                    {
-                        throw;
-                    }
+
+                    company.PhotoPath = "/uploads/" + uniqueFileName;
                 }
+
+                _context.Update(company);
+                await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
             return View(company);
         }
+
+
 
         // GET: Companies/Delete/5
         public async Task<IActionResult> Delete(int? id)

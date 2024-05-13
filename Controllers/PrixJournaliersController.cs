@@ -28,6 +28,17 @@ namespace FuelPredictor.Controllers
 
         public async Task<IActionResult> IndexStation(int? id)
         {
+            // Récupérer la liste des stations
+            var stations = await _context.Station.ToListAsync();
+
+            // Sélectionner la station correspondant à l'ID passé en paramètre
+            var selectedStation = stations.FirstOrDefault(s => s.Id == id);
+
+            // Créer la liste déroulante des stations en sélectionnant la station correspondante
+            var stationList = new SelectList(stations, "Id", "Nom", selectedStation?.Id);
+
+            ViewData["StationList"] = stationList;
+            ViewData["CarburantList"] = new SelectList(_context.Carburant, "Id", "TypeCarburant");
             if (id == null || _context.PrixJournalier == null)
             {
                 return NotFound();
@@ -56,13 +67,28 @@ namespace FuelPredictor.Controllers
             return View(prixJournalier);
         }
 
-        // GET: PrixJournaliers/Create
         public IActionResult Create()
         {
             ViewData["IDCarburant"] = new SelectList(_context.Carburant, "Id", "TypeCarburant");
             ViewData["IDStation"] = new SelectList(_context.Station, "Id", "Nom");
             return View();
         }
+        public IActionResult CreateForStation(int id)
+        {
+            var stations =  _context.Station.ToList();
+
+            // Sélectionner la station correspondant à l'ID passé en paramètre
+            var selectedStation = stations.FirstOrDefault(s => s.Id == id);
+
+            // Créer la liste déroulante des stations en sélectionnant la station correspondante
+            var stationList = new SelectList(stations, "Id", "Nom", selectedStation?.Id);
+
+            ViewData["StationList"] = stationList;
+            ViewData["CarburantList"] = new SelectList(_context.Carburant, "Id", "TypeCarburant");
+     
+            return View();
+        }
+        // GET: PrixJournaliers/Create
 
         // POST: PrixJournaliers/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.

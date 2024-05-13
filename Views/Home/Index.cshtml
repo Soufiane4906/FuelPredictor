@@ -5,6 +5,14 @@
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
+
+@{
+    ViewData["Title"] = "Home Page";
+}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+
+
 <h4 style="text-align:center;">Liste des prix des stations au @DateTime.Now.Date.ToString("dd/MM/yyyy")</h4>
 <style>
     #Home {
@@ -14,68 +22,23 @@
 
 
 
-@{
-    ViewData["Title"] = "Home Page";
-}
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
-<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-
-
-
 <div class="container" style="margin-top:25px; background-image: url('~/images/back.jpg'); background-size: cover;">
     <!-- Left column for the map -->
     <div class="row">
-        <div class="col-5">
-            <div id="map" style="height: 400px;"></div>
-        </div>
-        
+     
+            <div class="col-5" id="map" style="height: 400px;"></div>
+      
+    
         <div class="col-7" id="DetailStation">
-            <canvas id="chart"></canvas>
+            <!-- Chart canvas for line chart -->
+            <canvas id="myChartLine"></canvas>
+            </div>
 
-            <script>
-                // Données statiques pour les étiquettes (dates) et les prix
-                const dates = ["2024-05-01", "2024-05-02", "2024-05-03", "2024-05-04", "2024-05-05"];
-                const prices = [14.56, 15.0, 14.56, 12.56, 14.56];
-
-                // Créer le graphique
-                var ctx = document.getElementById('chart').getContext('2d');
-                var myChart = new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: dates,
-                        datasets: [{
-                            label: 'Prix Journaliers',
-                            data: prices,
-                            fill: false,
-                            borderColor: 'rgb(75, 192, 192)',
-                            tension: 0.1
-                        }]
-                    },
-                    options: {
-                        scales: {
-                            x: {
-                                type: 'time',
-                                time: {
-                                    unit: 'day'
-                                }
-                            },
-                            y: {
-                                title: {
-                                    display: true,
-                                    text: 'Prix'
-                                }
-                            }
-                        }
-                    }
-                });
-            </script>
-
-
-
-       
-            <div id="prediction"></div>
-        </div>
+     
        </div>
+
+
+     
 
     <div class="row">
         <div class="col-12">
@@ -123,7 +86,7 @@
 </div>
 
 @section scripts {
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.bundle.js" asp-append-version="true"></script>
 
     <script src="~/lib/datatables/js/dataTables.bootstrap4.js"></script>
     <script src="~/lib/datatables/js/jquery.dataTables.js"></script>
@@ -133,7 +96,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js" asp-append-version="true"></script>
 
     <script>
-        $(document).ready(function () {
+    $(document).ready(function () {
             $('#stationsTable').DataTable({
                 "serverSide": true,
                 "ajax": {
@@ -181,74 +144,76 @@
             });
         });
 
-        /*
-
-        function fetchPrixJournaliers(stationId) {
-            $.ajax({
-                url: '/Home/GetPrixJournaliers',
-                type: 'GET',
-                data: { stationId: stationId },
-                success: function (data) {
-                    // Mettre à jour les attributs data
-                    $('#chart').attr('data-dates', JSON.stringify(data.dates));
-                    $('#chart').attr('data-prices', JSON.stringify(data.prices));
-
-                    // Créer ou mettre à jour le graphique
-                    renderChart();
-                },
-                error: function (xhr, status, error) {
-                    console.error(error);
-                }
-            });
-        }
-
-
-        function renderChart() {
-            var canvas = document.getElementById('chart');
-            var dates = JSON.parse(canvas.getAttribute('data-dates'));
-            var prices = JSON.parse(canvas.getAttribute('data-prices'));
-
-            var ctx = canvas.getContext('2d');
-            var myChart = new Chart(ctx, {
+        document.addEventListener('DOMContentLoaded', function () {
+            // Initialize the chart with static data
+            var ctx2 = document.getElementById("myChartLine").getContext('2d');
+            var lineChart = new Chart(ctx2, {
                 type: 'line',
+                height: "230px",
+                width: "300px",
+                responsive: false,
+                animation: false,
+                legend: { position: 'bottom' },
                 data: {
-                    labels: dates,
+                    labels: ["Education", "Lodging", "Fooding", "Travelling", "Communication", "Others"],
                     datasets: [{
-                        label: 'Prix Journaliers',
-                        data: prices,
-                        fill: false,
-                        borderColor: 'rgb(75, 192, 192)',
-                        tension: 0.1
+                        label: 'Monthly Expenses',
+                        data: [200, 150, 100, 80, 50, 30], // Static data
+                        backgroundColor: "rgb(66, 134, 244)"
                     }]
                 },
                 options: {
+                    events: ['click'],
+                    scaleShowValues: true,
                     scales: {
-                        x: {
-                            type: 'time',
-                            time: {
-                                unit: 'day'
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero: true
                             }
-                        },
-                        y: {
-                            title: {
-                                display: true,
-                                text: 'Prix'
+                        }],
+                        xAxes: [{
+                            ticks: {
+                                autoSkip: false
                             }
-                        }
+                        }]
                     }
                 }
             });
-        }
-        */
 
+            // Function to update the chart based on the selected station
+            function updateChart(stationId) {
+                $.ajax({
+                    url: '/Home/GetPrixJournaliers',
+                    type: 'GET',
+                    data: { stationId: stationId },
+                    success: function (data) {
+                        // Extract the relevant data from the response
+                        var labels = data.map(function (item) { return item.carburant.typeCarburant; });
+                        var prices = data.map(function (item) { return item.prix; });
 
-    function showStationOnMap(latitude, longitude) {
-        map.setView([latitude, longitude], 20);
-        window.scrollTo({
-            top: 0,
-            behavior: 'smooth' // pour un défilement fluide, utilisez 'smooth'
+                        // Update the chart with the new data
+                        lineChart.data.labels = labels;
+                        lineChart.data.datasets[0].data = prices;
+                        lineChart.update();
+                    },
+                    error: function (xhr, status, error) {
+                        console.error(error);
+                    }
+                });
+            }
+
+            // Event listener for chart click
+            ctx2.canvas.addEventListener('click', function (evt) {
+                var activePoint = lineChart.getElementsAtEvent(evt)[0];
+                if (activePoint) {
+                    var stationId = activePoint._model.label; // Assuming the label corresponds to the station ID
+                    updateChart(stationId);
+                }
+            });
         });
-    }
+
+
+
 
 
 
@@ -274,7 +239,7 @@
             'Prix Gasoil aujourd\'hui: ' + item.prixGasoilAujourdhui + '<br>' +
             'Prix Essence aujourd\'hui: ' + item.prixEssenceAujourdhui + '<br>' +
             
-            '<button onclick="fetchPrixJournaliers(' + item.id + ')" class="btn btn-outline-success">Afficher les prix journaliers</button>'+
+                '<button onclick="updateChart(' + item.id + ')" class="btn btn-outline-success"   <img src="~/images/stat.jpg" alt="Statistics Image"> ></button>' +
             '<a href="/PrixJournaliers/IndexStation/' + item.id + '" class="btn btn-outline-success">Liste des prix</a></div>';
         L.marker([item.latitude, item.longitude]).addTo(map)
             .bindPopup(popupContent)
@@ -304,7 +269,56 @@
             }
         }
     }
+        function showStationOnMap(latitude, longitude) {
+            map.setView([latitude, longitude], 20);
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth' // pour un défilement fluide, utilisez 'smooth'
+            });
+        }
 </script>
+    <script>
+        function updateChart(stationId) {
+            $.ajax({
+                url: '/VotreController/GetPrixJournaliersJson?stationId=' + stationId,
+                type: 'GET',
+                success: function (data) {
+                    // Traitez les données renvoyées ici et mettez à jour votre graphique
+                    // Exemple de code pour le traitement des données et la mise à jour du graphique
+                    var labels = [];
+                    var prices = [];
+                    for (var i = 0; i < data.length; i++) {
+                        var item = data[i];
+                        labels.push(item.carburant.type); // Assurez-vous de récupérer le type de carburant correctement
+                        // Supposons que le prix soit stocké dans une propriété "prix"
+                        prices.push(item.prix); // Assurez-vous de récupérer le prix correctement
+                    }
+                    // Exemple de mise à jour du graphique (utilisez votre propre logique)
+                    // Suppose que vous utilisez Chart.js
+                    var ctx = document.getElementById('myChartLine').getContext('2d');
+                    var myChart = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: 'Prix par carburant',
+                                data: prices,
+                                borderColor: 'rgb(75, 192, 192)',
+                                fill: false
+                            }]
+                        },
+                        options: {
+                            // Vos options de graphique
+                        }
+                    });
+                },
+                error: function (error) {
+                    console.log('Une erreur s\'est produite lors de la récupération des données.');
+                }
+            });
+        }
+    </script>
+
 
 
 

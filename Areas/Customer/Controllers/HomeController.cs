@@ -36,17 +36,17 @@ namespace FuelPredictor.Areas.Customer.Controllers
                 Ville = s.Ville != null ? s.Ville.Name : null,
                 Company = s.Company != null ? s.Company.Nom : null,
                 PrixGasoilAujourdhui = s.PrixJournaliers
-    .Where(p => p.Carburant.TypeCarburant == "Diesel" && p.date.Date == DateTime.Today)
-    .Select(p => p.prix)
-    .FirstOrDefault(),
-                PrixEssenceAujourdhui = s.PrixJournaliers
-    .Where(p => p.Carburant.TypeCarburant == "Essence" && p.date.Date == DateTime.Today)
-    .Select(p => p.prix)
-    .FirstOrDefault()
-            }
+                    .Where(p => p.Carburant.TypeCarburant == "Diesel" && p.date.Date == DateTime.Today)
+                    .Select(p => p.prix)
+                    .FirstOrDefault(),
+                                PrixEssenceAujourdhui = s.PrixJournaliers
+                    .Where(p => p.Carburant.TypeCarburant == "Essence" && p.date.Date == DateTime.Today)
+                    .Select(p => p.prix)
+                    .FirstOrDefault()
+                            }
             
-            )
-.ToListAsync();
+                            )
+                .ToListAsync();
 
       
 
@@ -55,14 +55,17 @@ namespace FuelPredictor.Areas.Customer.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetPrixJournaliers(int stationId)
+        public IActionResult GetPrixJournaliersJson(int stationId)
         {
             var prixJournaliers = _context.PrixJournalier
-                .Where(p => p.IDStation == stationId).Include(u=>u.Carburant)
+                .Where(p => p.IDStation == stationId)
+                .Include(u => u.Carburant)
+                .GroupBy(u => u.IDCarburant)
                 .ToList();
 
             return Json(prixJournaliers);
         }
+
         public IActionResult Privacy()
         {
             return View();

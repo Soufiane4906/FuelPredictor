@@ -15,7 +15,7 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Edit" class="btn btn-warning">
+        <form asp-action="Edit" method="post" class="btn btn-warning" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
             <div class="form-group">
@@ -43,11 +43,15 @@
                 <input asp-for="Telephone" class="form-control" />
                 <span asp-validation-for="Telephone" class="text-danger"></span>
             </div>
+
             <div class="form-group">
-                <label asp-for="Image" class="control-label"></label>
-                <input asp-for="Image" class="form-control" />
-                <span asp-validation-for="Image" class="text-danger"></span>
+                    <label asp-for="photo" class="control-label"></label>
+                    <input type="file" asp-for="photo" class="form-control" />
             </div>
+            <div class="form-group">
+                <img src="@Url.Content("~/images/" + @Model.PhotoPath)" width="100px" height="100px">
+            </div>
+
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
             </div>

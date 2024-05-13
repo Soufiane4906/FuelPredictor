@@ -72,6 +72,7 @@ namespace FuelPredictor.Controllers
         .Take(pageSize)
         .Select(s => new StationDto
         {
+            Id=s.Id,
             Nom = s.Nom,
             Adresse = s.Adresse,
             Latitude = s.Latitude,
@@ -126,7 +127,7 @@ namespace FuelPredictor.Controllers
             ViewData["IDGerant"] = new SelectList(_context.ApplicationUser, "Id", "Id");
             ViewData["IDVille"] = new SelectList(_context.Ville, "Id", "Name");
 
-            ViewData["IDCompany"] = new SelectList(_context.Companies, "Id", "Name");
+            ViewData["IDCompany"] = new SelectList(_context.Companies, "Id", "Nom");
             return View();
         }
 
@@ -135,7 +136,7 @@ namespace FuelPredictor.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Nom,Adresse,Latitude,Longitude,Id , IDVille")] Station station)
+        public async Task<IActionResult> Create([Bind("Nom,Adresse,Latitude,Longitude,Id , IDVille  , IDCompany")] Station station)
         {
             if (ModelState.IsValid)
             {
@@ -166,6 +167,7 @@ namespace FuelPredictor.Controllers
         public async Task<IActionResult> Edit(int? id)
         {
             ViewData["IDVille"] = new SelectList(_context.Ville, "Id", "Name");
+            ViewData["IDCompany"] = new SelectList(_context.Companies, "Id", "Nom");
 
             if (id == null || _context.Station == null)
             {
@@ -186,9 +188,10 @@ namespace FuelPredictor.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Nom,Adresse,Latitude,Longitude,Id , IDVille")] Station station)
+        public async Task<IActionResult> Edit(int id, [Bind("Nom,Adresse,Latitude,Longitude,Id , IDVille,IDCompany")] Station station)
         {
             ViewData["IDVille"] = new SelectList(_context.Ville, "Id", "Name", station.IDVille);
+            ViewData["IDCompany"] = new SelectList(_context.Companies, "Id", "Nom", station.IDCompany);
 
             if (id != station.Id)
             {

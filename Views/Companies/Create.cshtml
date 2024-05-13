@@ -17,7 +17,7 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Create">
+        <form asp-action="Create" method="post" class="btn btn-warning" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="Nom" class="control-label"></label>
@@ -44,10 +44,18 @@
                 <input asp-for="Telephone" class="form-control" />
                 <span asp-validation-for="Telephone" class="text-danger"></span>
             </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label asp-for="photo" class="control-label"></label>
+                    <input type="file" asp-for="photo" class="form-control" />
+                </div>
+
+            </div>
             <div class="form-group">
-                <label asp-for="Image" class="control-label"></label>
-                <input asp-for="Image" class="form-control" />
-                <span asp-validation-for="Image" class="text-danger"></span>
+                @if (Model != null && !string.IsNullOrEmpty(Model.PhotoPath))
+                {
+                    <img src="@Url.Content("~/images/" + Model.PhotoPath)" width="100px" height="100px">
+                }
             </div>
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
