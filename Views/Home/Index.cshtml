@@ -40,7 +40,7 @@
 
      
 
-    <div class="row">
+    <div class="row" style="background:azure;">
         <div class="col-12">
     
     
@@ -155,11 +155,16 @@
                 animation: false,
                 legend: { position: 'bottom' },
                 data: {
-                    labels: ["Education", "Lodging", "Fooding", "Travelling", "Communication", "Others"],
+                    labels: ["January", "February", "March", "April", "May", "June"], // Assuming time periods as months
                     datasets: [{
-                        label: 'Monthly Expenses',
-                        data: [200, 150, 100, 80, 50, 30], // Static data
+                        label: 'Essence',
+                        data: [100, 80, 60, 40, 20, 10], // Static data for Essence
                         backgroundColor: "rgb(66, 134, 244)"
+                    },
+                    {
+                        label: 'Gazoil',
+                        data: [150, 120, 90, 70, 40, 20], // Static data for Gazoil
+                        backgroundColor: "rgb(255, 99, 132)"
                     }]
                 },
                 options: {
@@ -239,7 +244,7 @@
             'Prix Gasoil aujourd\'hui: ' + item.prixGasoilAujourdhui + '<br>' +
             'Prix Essence aujourd\'hui: ' + item.prixEssenceAujourdhui + '<br>' +
             
-                '<button onclick="updateChart(' + item.id + ')" class="btn btn-outline-success"   <img src="~/images/stat.jpg" alt="Statistics Image"> ></button>' +
+                '<button onclick="updateChart(' + item.id + ')" class="btn btn-outline-success"   <img src="~/images/stat.jpg" alt="Statistics Image"> Variation des prix</button>' +
             '<a href="/PrixJournaliers/IndexStation/' + item.id + '" class="btn btn-outline-success">Liste des prix</a></div>';
         L.marker([item.latitude, item.longitude]).addTo(map)
             .bindPopup(popupContent)
