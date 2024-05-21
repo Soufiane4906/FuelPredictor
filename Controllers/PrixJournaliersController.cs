@@ -7,17 +7,37 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using FuelPredictor.Data;
 using FuelPredictor.Models.V2;
+using FuelPredictor.Service;
 
 namespace FuelPredictor.Controllers
 {
     public class PrixJournaliersController : Controller
     {
         private readonly FuelPredictorContext _context;
+        private readonly PredictionService _predictionService;
+
 
         public PrixJournaliersController(FuelPredictorContext context)
         {
             _context = context;
+            _predictionService = new PredictionService(context);
         }
+
+        public async Task<IActionResult> PredictPrix(int stationId, int carburantId, DateTime date)
+        {
+            try
+            {
+                float predictedPrix = await _predictionService.PredictPrixJournalierAsync(stationId, carburantId, date);
+                return Ok(new { predictedPrix });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { error = ex.Message });
+            }
+        }
+
+
+
 
         // GET: PrixJournaliers
         public async Task<IActionResult> Index()
@@ -181,6 +201,34 @@ namespace FuelPredictor.Controllers
             }
 
             return View(prixJournalier);
+        }
+        [HttpGet]
+        public async Task<IActionResult> PrixJournaliersByStation(int? stationId)
+        {
+            if (stationId == null)
+            {
+                return BadRequest("Station ID is required.");
+            }
+
+            var prixJournaliers = await _context.PrixJournalier
+                .Where(p => p.IDStation == stationId)
+                .Include(p => p.Carburant)
+                .Select(p => new
+                {
+                    prix = p.prix,
+                    date = p.date.ToString("dd-MM-yyyy"), // Formater la date en jour-mois-année
+                    idStation = p.IDStation,
+                    station = p.Station,
+                    idCarburant = p.IDCarburant,
+                    carburant = p.Carburant,
+                    id = p.Id,
+                    createdAt = p.CreatedAt,
+                    updatedAt = p.UpdatedAt,
+                    deletedAt = p.DeletedAt
+                })
+                .ToListAsync();
+
+            return Json(prixJournaliers);
         }
 
         // POST: PrixJournaliers/Delete/5
