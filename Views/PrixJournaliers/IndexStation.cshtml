@@ -1,11 +1,15 @@
 ﻿@model IEnumerable<FuelPredictor.Models.V2.PrixJournalier>
 
+
 @{
     ViewData["Title"] = "IndexStation";
     Layout = "~/Views/Shared/_Layout.cshtml";
  
     var stationList = ViewData["StationList"] ;
     var carburantList = ViewData["CarburantList"] ;
+    //get the name of the first item in the @model
+        var stationName = Model.FirstOrDefault()?.Station?.Nom;
+    
 
 
 }
@@ -15,13 +19,22 @@
     }
 </style>
 
-<h1>IndexStation</h1>
+    <h1 style="text-align:center;">Historique des prix  <b>@stationName</b> </h1>
+
+
+
+
+
 
 <p>
     <button type="button" class="btn btn-outline-info" id="btnOpenModal" data-toggle="modal" data-target="#createModal">
         Create New
     </button>
 </p>
+
+
+
+
 <table class="table table-success table-striped table-hover ">
     <thead>
         <tr>
@@ -31,9 +44,7 @@
             <th>
                 @Html.DisplayNameFor(model => model.date)
             </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Station)
-            </th>
+         
             <th>
                 @Html.DisplayNameFor(model => model.Carburant)
             </th>
@@ -49,9 +60,7 @@
             <td>
                 @Html.DisplayFor(modelItem => item.date)
             </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Station.Nom)
-            </td>
+
             <td>
                 @Html.DisplayFor(modelItem => item.Carburant.TypeCarburant)
             </td>

@@ -37,6 +37,14 @@ namespace FuelPredictor.Controllers
             return View(await fuelPredictorContext.ToListAsync());
         }
 
+        public async Task<IActionResult> IndexSuperAdmin()
+        {
+            var currentUser = await _userManager.GetUserAsync(User);
+            var fuelPredictorContext = _context.Station.Include(u => u.Ville);
+            return View(await fuelPredictorContext.ToListAsync());
+        }
+
+
 
         [HttpPost]
         public IActionResult GetStations()

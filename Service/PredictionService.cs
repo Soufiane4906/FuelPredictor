@@ -11,7 +11,7 @@ namespace FuelPredictor.Service
         {
             _context = context;
         }
-
+        
         public async Task<float> PredictPrixJournalierAsync(int stationId, int carburantId, DateTime date, double alpha = 0.5)
         {
             var prixJournalierList = await _context.PrixJournalier

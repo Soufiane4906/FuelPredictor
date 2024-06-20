@@ -5,11 +5,15 @@ using System.ComponentModel.DataAnnotations;
 
 
 namespace FuelPredictor.Models.V2
+
 {
+    //I want to display the name in views
+    [Display(Name = "Station")]
     public class Station :ModelBase
     {
 
-
+        //show the name in views
+         
         public string Nom { get; set; }
         public string Adresse { get; set; }
         public double Latitude { get; set; }

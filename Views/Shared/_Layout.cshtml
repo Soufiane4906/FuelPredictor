@@ -35,20 +35,22 @@
                         </li>
                         @if (User.IsInRole("SuperAdmin"))
                         {
-                           
-                          
-                                <ul >
-                                 
-                                    
-                        
-                                            <ul><a class="nav-link text-white" asp-area="" asp-controller="RoleManager"> Roles </a></ul>
-                                            <ul><a class="nav-link text-white" asp-area="" asp-controller="UserRoles">Utilisateurs</a></ul>
+
+
+
+
+
+                            <ul><a class="nav-link text-white" id="Roles" asp-area="" asp-controller="RoleManager"> Roles </a></ul>
+                            <ul><a class="nav-link text-white" id="Utilisateurs" asp-area="" asp-controller="UserRoles">Utilisateurs</a></ul>
+                              
+                                <ul><a class="nav-link text-white" id="Companies" asp-area="" asp-controller="Companies" asp-action="Index"> Sociétés </a></ul>
+                                <ul><a class="nav-link text-white" id="Stations" asp-area="" asp-controller="Stations" asp-action="IndexSuperAdmin"> Stations </a></ul>
                     
 
 
 
 
-                                </ul>
+                               
                         }
 
 
