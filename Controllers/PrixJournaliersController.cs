@@ -8,6 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using FuelPredictor.Data;
 using FuelPredictor.Models.V2;
 using FuelPredictor.Service;
+using Microsoft.AspNetCore.Identity;
+using FuelPredictor.Models.Users;
 
 namespace FuelPredictor.Controllers
 {
@@ -15,11 +17,13 @@ namespace FuelPredictor.Controllers
     {
         private readonly FuelPredictorContext _context;
         private readonly PredictionService _predictionService;
+        private readonly UserManager<ApplicationUser> _userManager;
 
 
-        public PrixJournaliersController(FuelPredictorContext context)
+        public PrixJournaliersController(FuelPredictorContext context , UserManager<ApplicationUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
             _predictionService = new PredictionService(context);
         }
 
@@ -42,9 +46,26 @@ namespace FuelPredictor.Controllers
         // GET: PrixJournaliers
         public async Task<IActionResult> Index()
         {
-            var fuelPredictorContext = _context.PrixJournalier.Include(p => p.Carburant).Include(p => p.Station);
-            return View(await fuelPredictorContext.ToListAsync());
+            var currentUser = await _userManager.GetUserAsync(User);
+            if (currentUser == null)
+            {
+                return NotFound();
+            }
+
+          
+            // Extract station IDs
+
+                var fuelPredictorContext = _context.PrixJournalier
+                    .Include(p => p.Carburant)
+                    .Include(p => p.Station)
+                    .Where(p => p.Station.IDGerant==currentUser.Id); // Filter by station IDs
+
+                return View(await fuelPredictorContext.ToListAsync());
+            
+
+            
         }
+
 
         public async Task<IActionResult> IndexStation(int? id)
         {
@@ -87,12 +108,23 @@ namespace FuelPredictor.Controllers
             return View(prixJournalier);
         }
 
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
+            var currentUser = await _userManager.GetUserAsync(User);
+            if (currentUser == null)
+            {
+                return NotFound();
+            }
+
+            // Filter stations where IDGerant equals current user's ID
+            var userStations = _context.Station.Where(s => s.IDGerant == currentUser.Id).ToList();
+
             ViewData["IDCarburant"] = new SelectList(_context.Carburant, "Id", "TypeCarburant");
-            ViewData["IDStation"] = new SelectList(_context.Station, "Id", "Nom");
+            ViewData["IDStation"] = new SelectList(userStations, "Id", "Nom");
+
             return View();
         }
+
         public IActionResult CreateForStation(int id)
         {
             var stations =  _context.Station.ToList();
@@ -213,23 +245,23 @@ namespace FuelPredictor.Controllers
             var prixJournaliers = await _context.PrixJournalier
                 .Where(p => p.IDStation == stationId)
                 .Include(p => p.Carburant)
-                .Select(p => new
+                .OrderBy(p => p.date)
+                .GroupBy(p => p.IDCarburant)
+                .Select(g => new
                 {
-                    prix = p.prix,
-                    date = p.date.ToString("dd-MM-yyyy"), // Formater la date en jour-mois-année
-                    idStation = p.IDStation,
-                    station = p.Station,
-                    idCarburant = p.IDCarburant,
-                    carburant = p.Carburant,
-                    id = p.Id,
-                    createdAt = p.CreatedAt,
-                    updatedAt = p.UpdatedAt,
-                    deletedAt = p.DeletedAt
+                    idCarburant = g.Key,
+                    carburant = g.FirstOrDefault().Carburant.TypeCarburant, // Assuming Carburant has a 'nom' property
+                    prixData = g.Select(p => new
+                    {
+                        prix = p.prix,
+                        date = p.date.ToString("dd-MM-yyyy")
+                    }).ToList()
                 })
                 .ToListAsync();
 
             return Json(prixJournaliers);
         }
+
 
         // POST: PrixJournaliers/Delete/5
         [HttpPost, ActionName("Delete")]

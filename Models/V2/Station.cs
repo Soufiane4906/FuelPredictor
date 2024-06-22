@@ -2,13 +2,14 @@
 using System.ComponentModel.DataAnnotations.Schema;
 using NetTopologySuite.Geometries;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel;
 
 
 namespace FuelPredictor.Models.V2
 
 {
     //I want to display the name in views
-    [Display(Name = "Station")]
+    [DisplayName( "Station")]
     public class Station :ModelBase
     {
 

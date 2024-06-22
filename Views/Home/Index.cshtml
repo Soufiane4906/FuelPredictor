@@ -15,6 +15,9 @@
 
 <h4 style="text-align:center;">Liste des prix des stations au @DateTime.Now.Date.ToString("dd/MM/yyyy")</h4>
 <style>
+ 
+
+
     #Home {
         text-decoration: underline;
     }
@@ -29,20 +32,20 @@
             <div class="col-5" id="map" style="height: 400px;"></div>
       
     
-        <div class="col-7" id="DetailStation">
+        <div class="col-7" id="DetailStation" style="display:none;">
             <!-- Chart canvas for line chart -->
             <canvas id="myChartLine"></canvas>
-            </div>
+         </div>
 
      
-       </div>
+     </div>
 
 
      
 
     <div class="row" style="background:azure;">
         <div class="col-12">
-    
+            
     
             <div class="right">
                 <div class="table-responsive">
@@ -60,20 +63,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                        @*     @foreach (var item in Model)
-                            {
-                                <tr>
-                                    
-                                    <td>@Html.DisplayFor(modelItem => item.Nom)</td>
-                                    <td>@Html.DisplayFor(modelItem => item.Adresse)</td>
-                                    <td>@Html.DisplayFor(modelItem => item.Company.Nom)</td>
-                                    <td>17,12</td>
-                                    <td>18,2</td>
-                                    <td>
-                                        <a asp-controller="PrixJournaliers" class="btn btn-outline-secondary" asp-action="IndexStation" asp-route-id="@item.Id">Historique des Prix</a>
-                                    </td>
-                                </tr>
-                            } *@
+              
                         </tbody>
                     </table>
                 </div>
@@ -99,7 +89,7 @@
                     <div class="form-group">
                         <label for="predictDate" class="col-form-label">Date:</label>
                         <input type="date" class="form-control" id="predictDate">
-                    </div>
+                        <label for="carburantId" class="col-form-label">Carburant</label>
                     <select class="form-control" id="carburantId">
                         <option value="1">Gasoil</option>
                         <option value="2">Essence</option>
@@ -108,7 +98,7 @@
 
                   
                     <input type="hidden" id="stationId">
-                   
+                    </div>
                 </form>
                 <div id="predictionResult"></div>
             </div>
@@ -123,17 +113,131 @@
 
 
 @section scripts {
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.bundle.js" asp-append-version="true"></script>
 
-    <script src="~/lib/datatables/js/dataTables.bootstrap4.js"></script>
-    <script src="~/lib/datatables/js/jquery.dataTables.js"></script>
-    <script src="~/lib/datatables/js/datatables.bootstrap4.js"></script>
-    <script src="~/lib/datatables/js/datatables.bootstrap4.min.js"></script>
-    <script src="~/js/BateauxDataTable.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js" asp-append-version="true"></script>
 
     <script>
+        var myChart = null;
         $(document).ready(function () {
+            $(document).on('click', '.variation-prix-btn', function () {
+                var stationId = $(this).data('id');
+
+                $.ajax({
+                    url: 'PrixJournaliers/PrixJournaliersByStation',
+                    type: 'GET',
+                    data: { stationId: stationId },
+                    success: function (data) {
+                        drawChart(data);
+                        $('#DetailStation').show();
+                    },
+                    error: function (error) {
+                        console.log(error);
+                    }
+                });
+            });
+        });
+
+        function drawChart(data) {
+            var labels = [];
+            var gasoilPrices = [];
+            var essencePrices = [];
+
+            data.forEach(function (group) {
+                group.prixData.forEach(function (item) {
+                    if (!labels.includes(item.date)) {
+                        labels.push(item.date);
+                    }
+                    if (group.idCarburant === 2) { // Assuming 1 represents Gasoil
+                        gasoilPrices.push(item.prix);
+                    } else if (group.idCarburant === 3) { // Assuming 2 represents Essence
+                        essencePrices.push(item.prix);
+                    }
+                });
+            });
+
+            var ctx = document.getElementById('myChartLine').getContext('2d');
+
+            // Destroy the old chart if it exists
+            if (myChart !== null) {
+                myChart.destroy();
+            }
+
+            // Create a new chart
+            myChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Prix Gasoil',
+                        data: gasoilPrices,
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1,
+                        fill: false
+                    }, {
+                        label: 'Prix Essence',
+                        data: essencePrices,
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 1,
+                        fill: false
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            display: true,
+                            title: {
+                                display: true,
+                                text: 'Date'
+                            }
+                        },
+                        y: {
+                            display: true,
+                            title: {
+                                display: true,
+                                text: 'Prix'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        //-----------------------------------------
+
+        var map = L.map('map').setView([33.5731, -7.5898], 13); // set initial position and zoom level for Casablanca
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        // Extract markers from ViewBag
+        var jsModel = @Html.Raw(Json.Serialize(Model));
+        console.log(jsModel)
+
+        // Add markers for each station
+
+        for (var i = 0; i < jsModel.length; i++) {
+            var item = jsModel[i];
+
+            var popupContent = '<div class="popup-content"><h3>' + item.nom + '</h3><br>' +
+                '<b>Adresse:</b>' + item.adresse + '<br>' +
+                '<b>Ville:</b>' + item.ville + '<br>' +
+                '<b>Société:</b>' + item.company + '<br>' +
+                '<b>Prix Gasoil aujourd\'hui:</b>' + item.prixGasoilAujourdhui + '<br>' +
+                '<b>Prix Essence aujourd\'hui:</b>' + item.prixEssenceAujourdhui + '<br>' +
+                '<button id="btnPredictPrix' + i + '" class="btn btn-outline-success predict-prix-btn" data-id="' + item.id + '" data-carburant-id="1">' +
+                '<i class="fas fa-chart-line"></i> Prédire le prix' +
+                '</button><br>' +
+                '<a href="/PrixJournaliers/IndexStation/' + item.id + '" class="btn btn-outline-success"><i class="fas fa-list"></i> Liste des prix</a></div>' +
+                '<a ' + item.id + '" class="btn btn-outline-success variation-prix-btn" data-id="' + item.id + '" "><i class="fas fa-chart-bar"></i> Variations des prix</a></div>';
+
+            L.marker([item.latitude, item.longitude]).addTo(map)
+                .bindPopup(popupContent)
+                .openPopup();
+        }
+
+        $(document).ready(function () {
+
             $('.predict-prix-btn').on('click', function () {
                 var stationId = $(this).data('id');
                 var carburantId = $(this).data('carburant-id'); // Ajustez cela selon le carburant
@@ -200,14 +304,18 @@
                     {
                         "data": null,
                         "render": function (data, type, row) {
-                            return `<button class="btn btn-outline-primary" onclick="showStationOnMap(${row.latitude}, ${row.longitude})">Voir sur la carte</button>`;
+                            //afficher l'image dans button
+
+
+                            return `<button class="btn btn-outline-primary" onclick="showStationOnMap(${row.latitude}, ${row.longitude})"><i class="fas fa-map-marker-alt"></i></button>`;
                         }
                     },
                     // Ajoutez d'autres colonnes si nécessaire
                     {
                         "data": null,
                         "render": function (data, type, row) {
-                            return `<a href="/PrixJournaliers/IndexStation/${row.id}">Historique des Prix</a>`;
+                            return `<a class="btn btn-outline-secondary" href="/PrixJournaliers/IndexStation/${row.id}"><i class="fas fa-history"></i></a>`;
+
                         }
                     }
                 ],
@@ -218,41 +326,10 @@
         });
 
 
-        //---------------------
+        
+    
 
-        //-----------------------------------------
-
-        var map = L.map('map').setView([33.5731, -7.5898], 13); // set initial position and zoom level for Casablanca
-
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        }).addTo(map);
-
-        // Extract markers from ViewBag
-        var jsModel = @Html.Raw(Json.Serialize(Model));
-        console.log(jsModel)
-
-        // Add markers for each station
-
-        for (var i = 0; i < jsModel.length; i++) {
-            var item = jsModel[i];
-            var popupContent = '<div style="text-align:center;"><strong>' + item.nom + '</strong><br>' +
-                'Adresse: ' + item.adresse + '<br>' +
-                'Ville: ' + item.ville + '<br>' +
-                'Société: ' + item.company + '<br>' +
-                'Prix Gasoil aujourd\'hui: ' + item.prixGasoilAujourdhui + '<br>' +
-                'Prix Essence aujourd\'hui: ' + item.prixEssenceAujourdhui + '<br>' +
-                '<button id="btnPredictPrix' + i + '" class="btn btn-outline-success predict-prix-btn" data-id="' + item.id + '" data-carburant-id="1">' +
-                'Prédire le prix' +
-                '</button><br>' +
-                '<a href="/PrixJournaliers/IndexStation/' + item.id + '" class="btn btn-outline-success">Liste des prix</a></div>';
-
-            L.marker([item.latitude, item.longitude]).addTo(map)
-                .bindPopup(popupContent)
-                .openPopup();
-        }
-
-
+  
         //-----------------------------------------------------------
 
         function searchTable() {
@@ -288,143 +365,19 @@
 
         //-----------------------------------------------------------------
 
-        document.addEventListener('DOMContentLoaded', function () {
-            var ctx2 = document.getElementById("myChartLine").getContext('2d');
-            var lineChart;
-
-            // Initialize the chart without any data
-            initializeChart([]);
-
-            function initializeChart(data) {
-                lineChart = new Chart(ctx2, {
-                    type: 'line',
-                    height: "230px",
-                    width: "300px",
-                    responsive: true,
-                    animation: false,
-                    legend: { position: 'bottom' },
-                    data: {
-                        labels: [],
-                        datasets: [{
-                            label: 'Prix par carburant',
-                            data: data,
-                            borderColor: 'rgb(75, 192, 192)',
-                            fill: false
-                        }]
-                    },
-                    options: {
-                        scales: {
-                            yAxes: [{
-                                ticks: {
-                                    beginAtZero: true
-                                }
-                            }]
-                        }
-                    }
-                });
-            }
-
-            // Event listener for chart click
-            ctx2.canvas.addEventListener('click', function (evt) {
-                var activePoint = lineChart.getElementsAtEvent(evt)[0];
-                if (activePoint) {
-                    var stationId = activePoint._model.label; // Assuming the label corresponds to the station ID
-                    updateChart(stationId);
-                }
-            });
-
-            // Récupérez le bouton par son ID
-            var btnUpdateChart = document.getElementById('btnUpdateChart');
-
-            // Ajoutez un écouteur d'événements au bouton pour appeler updateChart lorsque le bouton est cliqué
-            btnUpdateChart.addEventListener('click', function () {
-                // Récupérez l'ID de la station à partir des attributs de données (si nécessaire)
-                var stationId = this.getAttribute('data-station-id');
-                // Appelez la fonction updateChart avec l'ID de la station
-                updateChart(stationId);
-            });
-        });
-
-        // Function to update the chart based on the selected station
-        function updateChart(stationId) {
-            // Check if lineChart is defined
-            if (!lineChart) {
-                console.error('lineChart is not defined');
-                return;
-            }
-
-            $.ajax({
-                url: '/PrixJournaliers/PrixJournaliersByStation',
-                type: 'GET',
-                data: { stationId: stationId },
-                success: function (data) {
-                    // Log the data received from the server
-                    console.log(data);
-
-                    // Extract relevant data for the chart
-                    var labels = []; // Labels for X-axis (carburant type)
-                    var prices = []; // Prices for Y-axis
-
-                    // Loop through the data to extract labels and prices
-                    for (var i = 0; i < data.length; i++) {
-                        labels.push(data[i].carburant.typeCarburant);
-                        prices.push(data[i].prix);
-                    }
-
-                    // Update the chart with the new data
-                    lineChart.data.labels = labels;
-                    lineChart.data.datasets[0].data = prices; // Assuming first dataset is for Diesel
-                    lineChart.update();
-                },
-                error: function (xhr, status, error) {
-                    console.error(error);
-                }
-            });
-        }
-
-
-        //--------------------------
-
-        // Add this script to your existing JavaScript
-        $(document).ready(function () {
-            // Event listener for button click
-            $('#btnUpdateChart').click(function () {
-                var stationId = $(this).data('station-id');
-                // AJAX request to fetch JSON data from server
-                $.getJSON("/PrixJournaliers/PrixJournaliersByStation", { stationId: stationId }, function (data) {
-                    var dataPoints = [];
-                    // Parse JSON data and convert it into CanvasJS DataPoints
-                    data.forEach(function (item) {
-                        dataPoints.push({ x: item.date, y: item.prix });
-                    });
-                    // Render the chart inside the modal
-                    renderChart(dataPoints);
-                    // Show the modal
-                    $('#chartModal').modal('show');
-                });
-            });
-
-            // Function to render the chart
-            function renderChart(dataPoints) {
-                var chart = new CanvasJS.Chart("chartContainer", {
-                    title: {
-                        text: "Chart Title"
-                    },
-                    data: [{
-                        type: "line",
-                        dataPoints: dataPoints,
-                    }]
-                });
-                chart.render();
-            }
-        });
-
 
 
 </script>
-  
 
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.bundle.js" asp-append-version="true"></script>
+
+    <script src="~/lib/datatables/js/dataTables.bootstrap4.js"></script>
+    <script src="~/lib/datatables/js/jquery.dataTables.js"></script>
+    <script src="~/lib/datatables/js/datatables.bootstrap4.js"></script>
+    <script src="~/lib/datatables/js/datatables.bootstrap4.min.js"></script>
+    <script src="~/js/BateauxDataTable.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js" asp-append-version="true"></script>
 
 
 }

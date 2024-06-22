@@ -1,7 +1,9 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace FuelPredictor.Models.V2
 {
+    [DisplayName("Compagnie")]
     public class Company
     {
         public int Id { get; set; } // Identifiant unique de la compagnie

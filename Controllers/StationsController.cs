@@ -9,7 +9,6 @@ using FuelPredictor.Data;
 using FuelPredictor.Models.V2;
 using FuelPredictor.Models.Users;
 using Microsoft.AspNetCore.Identity;
-using static System.Collections.Specialized.BitVector32;
 using FuelPredictor.Models.Dto;
 
 namespace FuelPredictor.Controllers
