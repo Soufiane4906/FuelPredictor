@@ -1,41 +1,30 @@
 ﻿@model IEnumerable<FuelPredictor.Models.V2.PrixJournalier>
 
-
 @{
     ViewData["Title"] = "IndexStation";
     Layout = "~/Views/Shared/_Layout.cshtml";
- 
-    var stationList = ViewData["StationList"] ;
-    var carburantList = ViewData["CarburantList"] ;
-    //get the name of the first item in the @model
-        var stationName = Model.FirstOrDefault()?.Station?.Nom;
-    
 
-
+    var stationList = ViewData["StationList"];
+    var carburantList = ViewData["CarburantList"];
+    var stationName = Model.FirstOrDefault()?.Station?.Nom;
 }
-<style>
-    #PrixJournaliers {
-        text-decoration: underline;
-    }
-</style>
 
-    <h1 style="text-align:center;">Historique des prix  <b>@stationName</b> </h1>
-
-
-
-
-
+<h1 style="text-align:center;">Historique des prix <b>@stationName</b></h1>
 
 <p>
-    <button type="button" class="btn btn-outline-info" id="btnOpenModal" data-toggle="modal" data-target="#createModal">
+    <button style="background: #2c4e2c; color: aliceblue;" type="button" class="btn btn-outline-info" id="btnOpenModal" data-toggle="modal" data-target="#createModal">
         Create New
     </button>
 </p>
 
 
+<div class="row">
+    <div class="col-md-6">
+        <input type="date" class="form-control" id="searchInput" placeholder="Search by date" />
+    </div>
+</div>
 
-
-<table class="table table-success table-striped table-hover ">
+<table id="prixTable" class="table table-success table-striped table-hover">
     <thead>
         <tr>
             <th>
@@ -44,7 +33,7 @@
             <th>
                 @Html.DisplayNameFor(model => model.date)
             </th>
-         
+
             <th>
                 @Html.DisplayNameFor(model => model.Carburant)
             </th>
@@ -52,27 +41,29 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.prix)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.date)
-            </td>
+        @foreach (var item in Model.OrderByDescending(m => m.date))
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.prix)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.date)
+                </td>
 
-            <td>
-                @Html.DisplayFor(modelItem => item.Carburant.TypeCarburant)
-            </td>
-            <td>
-                <a asp-action="Edit" class="btn btn-warning" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" class="btn btn-info" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" class="btn btn-danger" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
+                <td>
+                    @Html.DisplayFor(modelItem => item.Carburant.TypeCarburant)
+                </td>
+                <td>
+                    <a asp-action="Edit" class="btn btn-warning" asp-route-id="@item.Id">Edit</a> |
+                    <a asp-action="Details" class="btn btn-info" asp-route-id="@item.Id">Details</a> |
+                    <a asp-action="Delete" class="btn btn-danger" asp-route-id="@item.Id">Delete</a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
+
 <!-- Modal -->
 <div class="modal fade" id="createModal" tabindex="-1" role="dialog" aria-labelledby="createModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
@@ -99,28 +90,18 @@
                 $('#createModal').modal('show');
             });
 
-            // Lorsque le formulaire de création est soumis
-            $('#createModal form').submit(function (e) {
-                e.preventDefault(); // Empêcher le comportement par défaut du formulaire
-
-                // Envoyer le formulaire en AJAX
-                $.ajax({
-                    url: $(this).attr('action'),
-                    type: 'POST',
-                    data: $(this).serialize(), // Sérialiser les données du formulaire
-                    success: function (data) {
-                        // Si la création est réussie, actualiser la page ou effectuer d'autres actions nécessaires
-                        location.reload(); // Actualiser la page après la création
-                    },
-                    error: function (xhr, status, error) {
-                        // En cas d'erreur, afficher un message d'erreur à l'utilisateur ou effectuer d'autres actions nécessaires
-                        console.error(error); // Afficher l'erreur dans la console du navigateur
+            // Recherche statique par date
+            $('#searchInput').on('keyup', function () {
+                var searchText = $(this).val().toLowerCase();
+                $('#prixTable tbody tr').each(function () {
+                    var dateText = $(this).find('td:nth-child(2)').text().toLowerCase();
+                    if (dateText.indexOf(searchText) === -1) {
+                        $(this).hide();
+                    } else {
+                        $(this).show();
                     }
                 });
             });
         });
-
     </script>
-
-
 }
